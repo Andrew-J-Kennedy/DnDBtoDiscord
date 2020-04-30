@@ -2,6 +2,7 @@
 // @namespace     https://openuserjs.org/users/Andrew-J-Kennedy
 // @name          DnDBtoDiscord
 // @description   DnD Beyond to Discord Integration
+// @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
 // @version       0.2.3
@@ -9,6 +10,8 @@
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @require       file:///home/andrew/git/DnDBtoDiscord/DnDBtoDiscordPrivate.js
 // @require       file:///home/andrew/git/DnDBtoDiscord/DnDBtoDiscord.js
+// @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
+
 // @grant none
 // ==/UserScript==
 
