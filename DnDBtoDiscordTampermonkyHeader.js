@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DnDBtoDiscord
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.2.1
 // @description  DnD Beyond to Discord Integration
 // @author       Andrew J Kennedy
 // @match        https://www.dndbeyond.com/encounters/*
