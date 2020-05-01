@@ -8,9 +8,8 @@
 // @version       0.2.3
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
-// @require       file:///home/andrew/git/DnDBtoDiscord/DnDBtoDiscordPrivate.js
-// @require       file:///home/andrew/git/DnDBtoDiscord/DnDBtoDiscord.js
 // @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
+// @require       file://C:/DnDBtoDiscordPrivate.js
 
 // @grant none
 // ==/UserScript==
