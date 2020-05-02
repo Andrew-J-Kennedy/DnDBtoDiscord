@@ -5,9 +5,10 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.3
+// @version       0.2.4
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
+// @match         https://www.dndbeyond.com/characters/*
 // @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
 // @require       file://C:/DnDBtoDiscordPrivate.js
 
@@ -217,7 +218,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
             characters: [
             ]
         };
-        for (var i = start; i < data[page].length; i++) {
+        for (var i = 0; i < data[page].length; i++) {
             console.log(data[page][i]);
             var jd = data[page][i]; // Job Details
 
@@ -338,14 +339,24 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
                 break;
         }
         if (! text) {console.log('DiscordServer,DiscordName Not Found');return}
-        const DiscordServer = text.replace(/([^,]*),([^,]*)/,'$1');
-        const DiscordName = text.replace(/([^,]*),([^,]*)/,'$2');
-        console.log('DiscordServer,DiscordName Found: ' + DiscordServer + ',' + DiscordName);
+        console.log('text: ' + text);
+        text = text.replace(/^"(.+(?="$))"$/, '$1'); // Remove and quotes
+        console.log('text: ' + text);
+        var values = text.split(',');
+        const DiscordServerName = values[0];
+        const DiscordIdName = values[1];
+        console.log(`DiscordServerName,DiscordIdName Found: ${DiscordServerName},${DiscordIdName}`);
+        var DiscordServer;
+        for (let rec of DiscordIds)     {if (DiscordIdName     === rec.name) {DiscordId = rec.id}}
+        for (let rec of DiscordServers) {if (DiscordServerName === rec.name) {DiscordServer = rec.settings}}
+        DiscordIdBot = DiscordServer[1].split('/')[0];
+        pre = DiscordServer[0];
+        uri = 'https://discordapp.com/api/webhooks/' + DiscordServer[1];
 
-        DiscordId    = DiscordIds[DiscordName];
-        DiscordIdBot = DiscordServerSettings[DiscordServer][1].split('/')[0];
-        pre = DiscordServerSettings[DiscordServer][0];
-        uri = 'https://discordapp.com/api/webhooks/' + DiscordServerSettings[DiscordServer][1];
+//        console.log('DiscordIdBot: ' + DiscordIdBot);
+//        console.log('pre: ' + pre);
+//        console.log('uri: ' + uri);
+
         // Username and Avatar details
         switch (page) {
             case 'characters':
