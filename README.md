@@ -19,17 +19,18 @@ C:\DnDBtoDiscordPrivate.js
 ==============================================================
 'use strict';
 // The Server Prefix annd Discord Bot Key for your games
-const DiscordServerSettings = {
-    CampaignName:  ['!','00--WEBHOOK-URL-00/QWERTY------------------------RANDOM-KEY----------------------XCVBNM'],
-};
+const DiscordServerSettings = [
+    {name: 'CampaignName', settings:  ['!','00--WEBHOOK-URL-00/QWERTY------------------------RANDOM-KEY----------------------XCVBNM']}
+];
 // The Discord Ids for your games (a DM may have multiple NPC users)
-const DiscordIds = {
-    DiscordName: '000000000000000000'
-};
+const DiscordIds = [
+    {name: 'DiscordName', id: '000000000000000000'},
+];
 ==============================================================
 
 Replace: 00--WEBHOOK-URL-00... with Discord Server Bot WebHook
 Replace: 000000000000000000... with Discord User Id
+
 
 Open Chrome at:  
 https://www.dndbeyond.com/
@@ -55,3 +56,26 @@ You shoudl see a [FREE TEXT] button appear to the right of the Charactger Builde
 To test [ctrl]+click on the [FREE TEXT] button and type something in.
 
 
+==============================================================
+
+Dev
+
+ln -s /opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js ./DnDBtoDiscordPrivate.js
+
+Critter DB
+!bestiary import https://critterdb.com/#/publishedbestiary/view/5ea4b8b463a0580dfd76d379
+
+https://critterdb.com/#/publishedbestiary/view/5ea4b8b463a0580dfd76d379
+
+
+==============================================================
+
+Beyond Darkmode v2.0
+
+Stylus Chrome Extension
+https://chrome.google.com/webstore/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne/related?hl=en
+
+
+https://userstyles.org/styles/183035/dnd-beyond-dark-character-sheets
+
+https://pastebin.com/ABaj0RyJ
