@@ -87,12 +87,22 @@ function sleep(ms,cb) {
         console.log('statBlock(e)')
     }
 ////////////////////////////////////////////////////////////////////////////////
+function initToggle (e) {
+    init = (init === 'On') ? 'Off' : 'On';
+    e.target.innerText = 'Init ' + init;
+}
+////////////////////////////////////////////////////////////////////////////////
+function rollInitative (e) {
+    var sendMsg = (init === 'On') ? '!init join' : '!check initiative';
+    sendToAvrea(e,sendMsg);
+}
+////////////////////////////////////////////////////////////////////////////////
     function freeText (e,DiscordIdOverride = null) {
         var sendMsg = prompt("Please enter your message:" );
         if (sendMsg) {sendMessage(sendMsg,DiscordIdOverride);}
     }
 ////////////////////////////////////////////////////////////////////////////////
-function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
+function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) {
 
     if (! sendMsg) {
         sendMsg = prompt("Please enter your message:");
@@ -114,12 +124,23 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
         sendMsgFinal = sendMsgFinal.replace('$1',Arg1);
     }
     if (sendMsg.includes('-t $2')) {  // Target Required
-        var target = prompt("Please enter your target:" );
-        if (target){
-            sendMsgFinal = sendMsgFinal.replace('$2',target)
-        } else {
-            sendMsgFinal = null;
+        if (init === 'On') {
+            var target = prompt("Please enter your target:" );
+            if (target){
+                sendMsgFinal = sendMsgFinal.replace('$2',target);
+            } else {
+                sendMsgFinal = null;
+            }
+        } else { // Remove targeting parameter if init system off
+            sendMsgFinal = sendMsgFinal.replace('-t $2','');
+            var args = prompt("Please enter and extra args:" );
+            if (target){
+                sendMsgFinal = sendMsgFinal + ' ' + args;
+            }
         }
+    }
+    if (sendMsg.includes('init ') && init === 'Off') { // Remove init argument if init system off
+        sendMsgFinal = sendMsgFinal.replace('init ','');
     }
     console.log(sendMsgFinal);
     sendMessage(sendMsgFinal,DiscordIdOverride);
@@ -144,8 +165,9 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
             ['ct-tab-list__nav-item'         ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(1)}],
             ['ct-tab-options__header-heading','click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(2)}],
             ['ct-free_text'                  ,'click'  ,'free text'    ,true      ,function(e){freeText(e);}],
+            ['ct-init_toggle'                ,'click'  ,'init toggle'  ,true      ,function(e){initToggle(e);}],
             ['ct-character-tidbits__avatar'  ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null);}],
-            ['ct-initiative-box'             ,'click'  ,'initiative'   ,true      ,function(e){sendToAvrea(e,'!init join',null);}],
+            ['ct-initiative-box'             ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
             ['ct-combat-attack--item'        ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
             ['ct-combat-action-attack-weapon','click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
             ['ct-combat-attack--spell'       ,'click'  ,'cast'         ,true      ,function(e){sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
@@ -333,6 +355,8 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
         pre = DiscordServer.pre;
         uri = 'https://discordapp.com/api/webhooks/' + DiscordServer.webhook;
 
+        init = (DiscordServer.init === 1 || page === 'encounters') ? 'On' : 'Off';
+
 //        console.log('DiscordIdBot: ' + DiscordIdBot);
 //        console.log('pre: ' + pre);
 //        console.log('uri: ' + uri);
@@ -373,6 +397,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
                 template: '<div class="ct-character-header-desktop__group"><div class="ct-character-header-desktop__button"><span class="ct-character-header-desktop__button-label dndb2d_text-here"></span></div></div>',
                 buttons: [
                     //classname                      ,text
+                    ['ct-init_toggle'                ,'Init ' + init],
                     ['ct-free_text'                  ,'Free Text']
                 ]
             }
@@ -404,6 +429,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
     var avatar_url;
     var pre;
     var uri;
+    var init;
 
     const page = (window.location.href.match(/characters/)) ? 'characters' : 'encounters';
     const pg = (page === 'characters') ? 'chr' : 'enc';  //Abbreviated form
