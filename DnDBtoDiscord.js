@@ -445,7 +445,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             cn: 'ct-character-sheet-desktop'
         }
     };
-    addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
+    sleep(200,function(){addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});});
     return;
 //   checkNode('class','container');
 //   checkNode('id'   ,'content');
