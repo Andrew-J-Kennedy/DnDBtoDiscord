@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.6
+// @version       0.2.7
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -465,7 +465,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             cn: 'ct-character-sheet-desktop'
         }
     };
-    addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
+    sleep(200,function(){addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});});
     return;
 //   checkNode('class','container');
 //   checkNode('id'   ,'content');
