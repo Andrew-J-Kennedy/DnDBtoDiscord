@@ -329,9 +329,9 @@ function sendToAvrea (e,sendMsg,Arg1_innerText,DiscordIdOverride = null) {
         var DiscordServer;
         for (let rec of DiscordIds)     {if (DiscordIdName     === rec.name) {DiscordId = rec.id}}
         for (let rec of DiscordServers) {if (DiscordServerName === rec.name) {DiscordServer = rec.settings}}
-        DiscordIdBot = DiscordServer[1].split('/')[0];
-        pre = DiscordServer[0];
-        uri = 'https://discordapp.com/api/webhooks/' + DiscordServer[1];
+        DiscordIdBot = DiscordServer.webhook.split('/')[0];
+        pre = DiscordServer.pre;
+        uri = 'https://discordapp.com/api/webhooks/' + DiscordServer.webhook;
 
 //        console.log('DiscordIdBot: ' + DiscordIdBot);
 //        console.log('pre: ' + pre);
