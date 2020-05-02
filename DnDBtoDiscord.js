@@ -494,7 +494,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
     
     if (document.getElementsByClassName(dt[pg].tc)) {
         console.log('launch sleep 2000')
-        sleep(2000,function(){main();});
+        sleep(3000,function(){main();});
     } else {
         console.log('launch with MutationObserver')
         addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
