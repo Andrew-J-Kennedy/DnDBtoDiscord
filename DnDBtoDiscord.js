@@ -83,9 +83,48 @@ function sleep(ms,cb) {
         }    
     }
 ////////////////////////////////////////////////////////////////////////////////
-    function statBlock (e) {
-        console.log('statBlock(e)')
+function statBlock (e) {
+    console.log('statBlock(e)')
+}
+////////////////////////////////////////////////////////////////////////////////
+function findRelevantParent (el,classname) {
+    
+    while ( el.parentNode && el.parentNode.classList && ! el.classList.contains(classname)) {
+        el = el.parentNode;
     }
+    el = (el.classList.contains(classname)) ? el : null;
+    return el;
+}
+////////////////////////////////////////////////////////////////////////////////
+function rollSkill (e) {
+    console.log('rollSkill(e)')
+
+    var skill = e.target.innerText;
+    var sendMsg = '!check ' + skill;
+
+    if (window.event.shiftKey) {
+        sendMsg = sendMsg + ' ' + prompt("Please enter additional args:" );
+    }
+    sendToAvrea(e,sendMsg);
+}
+////////////////////////////////////////////////////////////////////////////////
+function rollSave (e) {
+    console.log('rollSave(e)')
+    var classname = 'ct-saving-throws-summary__ability';
+    var p = findRelevantParent(e.target,classname);
+    if (! p) {console.log('Classname not found: ' + classname);return}
+    var save;
+    for (let cn of p.classList) {
+        if (cn.includes(classname + '--')) {
+            save = cn.replace(classname + '--','');
+        }
+    }
+    var sendMsg = '!save ' + save;
+    if (window.event.shiftKey) {
+        sendMsg = sendMsg + ' ' + prompt("Please enter additional args:" );
+    }
+    sendToAvrea(e,sendMsg);
+}
 ////////////////////////////////////////////////////////////////////////////////
 function initToggle (e) {
     init = (init === 'On') ? 'Off' : 'On';
@@ -150,28 +189,30 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
         console.log('addNewEventListeners');
         const data = {
          encounters: [
-            //classname                      ,type     ,logMessage     ,override  ,function
-            ['qa-init_begin'                 ,'click'  ,'start'        ,true      ,function(e){sendToAvrea(e,'!init begin',null,DiscordIdBot);}],
-            ['qa-init_madd'                  ,'click'  ,'add mob'      ,true      ,function(e){addMobs(e);}],
-            ['qa-init_next'                  ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null,DiscordIdBot);}],
-            ['qa-init_list'                  ,'click'  ,'list'         ,true      ,function(e){sendToAvrea(e,'!init list',null,DiscordIdBot);}],
-            ['qa-init_end'                   ,'click'  ,'end'          ,true      ,function(e){sendToAvrea(e,'!init end -yes',null,DiscordIdBot);}],
-            ['qa-chat'                       ,'click'  ,'chat'         ,true      ,function(e){freeText(e,DiscordIdBot);}],
-            ['qa-chat_bot'                   ,'click'  ,'chat bot'     ,true      ,function(e){sendToAvrea(e,null,null,DiscordIdBot);}],
-            ['encounter-details-monster'     ,'click'  ,'monster'      ,true      ,function(e){selectMobs(e);}]
+            //classname                         ,type     ,logMessage     ,override  ,function
+            ['qa-init_begin'                    ,'click'  ,'start'        ,true      ,function(e){sendToAvrea(e,'!init begin',null,DiscordIdBot);}],
+            ['qa-init_madd'                     ,'click'  ,'add mob'      ,true      ,function(e){addMobs(e);}],
+            ['qa-init_next'                     ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null,DiscordIdBot);}],
+            ['qa-init_list'                     ,'click'  ,'list'         ,true      ,function(e){sendToAvrea(e,'!init list',null,DiscordIdBot);}],
+            ['qa-init_end'                      ,'click'  ,'end'          ,true      ,function(e){sendToAvrea(e,'!init end -yes',null,DiscordIdBot);}],
+            ['qa-chat'                          ,'click'  ,'chat'         ,true      ,function(e){freeText(e,DiscordIdBot);}],
+            ['qa-chat_bot'                      ,'click'  ,'chat bot'     ,true      ,function(e){sendToAvrea(e,null,null,DiscordIdBot);}],
+            ['encounter-details-monster'        ,'click'  ,'monster'      ,true      ,function(e){selectMobs(e);}]
         ]
         ,characters: [
-            //classname                      ,type     ,logMessage     ,override  ,function
-            ['ct-tab-list__nav-item'         ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(1)}],
-            ['ct-tab-options__header-heading','click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(2)}],
-            ['ct-free_text'                  ,'click'  ,'free text'    ,true      ,function(e){freeText(e);}],
-            ['ct-init_toggle'                ,'click'  ,'init toggle'  ,true      ,function(e){initToggle(e);}],
-            ['ct-character-tidbits__avatar'  ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null);}],
-            ['ct-initiative-box'             ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
-            ['ct-combat-attack--item'        ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['ct-combat-action-attack-weapon','click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['ct-combat-attack--spell'       ,'click'  ,'cast'         ,true      ,function(e){sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
-            ['ct-skills__item'               ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
+            //classname                         ,type     ,logMessage     ,override  ,function
+            ['ct-tab-list__nav-item'            ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(1)}],
+            ['ct-tab-options__header-heading'   ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(2)}],
+            ['ct-free_text'                     ,'click'  ,'free text'    ,true      ,function(e){freeText(e);}],
+            ['ct-init_toggle'                   ,'click'  ,'init toggle'  ,true      ,function(e){initToggle(e);}],
+            ['ct-character-tidbits__avatar'     ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null);}],
+            ['ct-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e);}],
+            ['ct-initiative-box'                ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
+            ['ct-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+            ['ct-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+            ['ct-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
+            ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){rollSkill(e);}]
+//          ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
         ]
         };
         for (var i = start; i < data[page].length; i++) {
@@ -403,17 +444,19 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             }
         };
         if (data[page].buttons.length > 0) {
-            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];
-            var tpn = document.createElement('div');
-            tpn.innerHTML = data[page].template;
-            for (var i = 0; i < data[page].buttons.length; i++) {
-                console.log(data[page].buttons[i]);
-                var classname = data[page].buttons[i][0];
-                var text = data[page].buttons[i][1];
-                var pn = tpn.cloneNode(true);
-                pn.childNodes[0].classList.add(classname);
-                pn.getElementsByClassName('dndb2d_text-here')[0].innerText = text
-                parentNode.appendChild(pn.childNodes[0]);
+            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];\
+            if (parentNode) {
+                var tpn = document.createElement('div');
+                tpn.innerHTML = data[page].template;
+                for (var i = 0; i < data[page].buttons.length; i++) {
+                    console.log(data[page].buttons[i]);
+                    var classname = data[page].buttons[i][0];
+                    var text = data[page].buttons[i][1];
+                    var pn = tpn.cloneNode(true);
+                    pn.childNodes[0].classList.add(classname);
+                    pn.getElementsByClassName('dndb2d_text-here')[0].innerText = text
+                    parentNode.appendChild(pn.childNodes[0]);
+                }
             }
         }
         // Add EventListeners and MutationObservers
@@ -438,14 +481,24 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
     const dt = {
         enc: {
             pn: 'encounter-builder-root',  
-            cn: 'encounter-details__body'
+            cn: 'encounter-details__body',
+            tc: 'encounter-details-content-section__content'
         },
         chr: {
             pn: 'character-sheet-target',
-            cn: 'ct-character-sheet-desktop'
+            cn: 'ct-character-sheet-desktop',
+            tc: 'ct-tooltip'
+
         }
     };
-    sleep(200,function(){addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});});
+    
+    if (document.getElementsByClassName(dt[pg].tc)) {
+        console.log('launch sleep 2000')
+        sleep(2000,function(){main();});
+    } else {
+        console.log('launch with MutationObserver')
+        addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
+    }
     return;
 //   checkNode('class','container');
 //   checkNode('id'   ,'content');
