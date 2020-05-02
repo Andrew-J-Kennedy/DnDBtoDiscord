@@ -460,7 +460,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
 //   checkNode('id'   ,'encounter-builder-root');
 //   checkNode('class','encounter-details');
 //   checkNode('class','encounter-details__body');
-//   checkNode('class','encounter-details__content'); 
+//   checkNode('class','encounter-details__content');
 })();
 /*
 /**/
