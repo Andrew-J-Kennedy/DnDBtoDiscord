@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.12
+// @version       0.2.13
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -129,6 +129,41 @@ function rollSkill (e) {
     sendToAvrea(e,sendMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
+function getSignedNumber (el) {
+    if (! el) {return '+0';}
+    if (el.getElementsByClassName('ct-signed-number').length != 1) {return '+0';}
+    var sign =  el.getElementsByClassName('ct-signed-number__sign')[0].innerText;
+    var number = el.getElementsByClassName('ct-signed-number__number')[0].innerText;
+    return sign + number;
+}
+////////////////////////////////////////////////////////////////////////////////
+function castAttackSpell(e,classname) {
+    console.log('castAttackSpell(e,classname)')
+    var p = findRelevantParent(e.target,classname);
+    if (! p) {console.log('Classname not found: ' + classname);return}
+    var spell_name = p.getElementsByClassName('ct-spell-name')[0].innerText;
+    var to_hit =getSignedNumber(p.getElementsByClassName('ct-combat-attack__tohit')[0]);
+    var damage = p.getElementsByClassName('ct-damage__value')[0].innerText;
+    var dmg_type = p.getElementsByClassName('ct-damage__icon')[0].getElementsByClassName('ct-tooltip ')[0].getAttribute('data-original-title');
+    
+    
+    console.log('spell_name: ' + spell_name);
+    console.log('to_hit: ' + to_hit);
+    console.log('damage: ' + damage);
+    console.log('dmg_type: ' + dmg_type);
+
+    var sendMsg = pre + 'multiline "\n';
+
+    sendMsg = sendMsg + pre + 'roll 1d20 ' + to_hit;
+    if (window.event.shiftKey) {
+        sendMsg = sendMsg + ' ' + prompt("Please enter additional args:" );
+    }
+    sendMsg = sendMsg + ' ' + spell_name + '\n';
+    sendMsg = sendMsg + pre + 'roll ' + damage + '[' + dmg_type + '] Damage\n"';
+    sendToAvrea(e,sendMsg);
+
+}
+////////////////////////////////////////////////////////////////////////////////
 function rollSave (e) {
     console.log('rollSave(e)')
     var classname = 'ct-saving-throws-summary__ability';
@@ -170,7 +205,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
 
     var sendMsgFinal = sendMsg;
     // Replace first char (if non alphanumeric) with server Prefix
-    sendMsgFinal = sendMsgFinal.replace(/^[^a-zA-Z0-9 ]/,pre);
+    sendMsgFinal = sendMsgFinal.replace(/^[^"a-zA-Z0-9 ]/,pre);
 
     if (Arg1_innerText) {
 //        console.log(Arg1_innerText);
@@ -231,7 +266,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             ['ct-initiative-box'                ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
             ['ct-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
             ['ct-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['ct-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
+            ['ct-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'ct-combat-attack--spell');}], //sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
             ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){rollSkill(e);}]
 //          ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
         ]
@@ -382,6 +417,29 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
         observer.observe(e, config);
     }
 ////////////////////////////////////////////////////////////////////////////////
+function getOS() {
+    var userAgent = window.navigator.userAgent,
+        platform = window.navigator.platform,
+        macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+        windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+        iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+        os = null;
+    
+    if (macosPlatforms.indexOf(platform) !== -1) {
+        os = 'Mac OS';
+    } else if (iosPlatforms.indexOf(platform) !== -1) {
+        os = 'iOS';
+    } else if (windowsPlatforms.indexOf(platform) !== -1) {
+        os = 'Windows';
+    } else if (/Android/.test(userAgent)) {
+        os = 'Android';
+    } else if (!os && /Linux/.test(platform)) {
+        os = 'Linux';
+    }
+    
+    return os;
+}
+////////////////////////////////////////////////////////////////////////////////
     function main() {
         console.log('main');
         var text;
@@ -509,13 +567,12 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             pn: 'character-sheet-target',
             cn: 'ct-character-sheet-desktop',
             tc: 'ct-tooltip'
-
         }
     };
-    
-    if (document.getElementsByClassName(dt[pg].tc)) {
-        console.log('launch sleep 2000')
-        sleep(3000,function(){main();});
+    var os = getOS();
+    if (os != 'Linux' && document.getElementsByClassName(dt[pg].tc)) {
+        console.log('launch sleep 5000')
+        sleep(5000,function(){main();});
     } else {
         console.log('launch with MutationObserver')
         addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
