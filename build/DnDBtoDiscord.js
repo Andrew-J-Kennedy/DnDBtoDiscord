@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.9
+// @version       0.2.10
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -464,7 +464,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             }
         };
         if (data[page].buttons.length > 0) {
-            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];\
+            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];
             if (parentNode) {
                 var tpn = document.createElement('div');
                 tpn.innerHTML = data[page].template;

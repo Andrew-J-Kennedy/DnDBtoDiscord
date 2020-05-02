@@ -444,7 +444,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             }
         };
         if (data[page].buttons.length > 0) {
-            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];\
+            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];
             if (parentNode) {
                 var tpn = document.createElement('div');
                 tpn.innerHTML = data[page].template;
