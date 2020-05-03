@@ -145,7 +145,7 @@ function castAttackSpell(e,classname) {
 ////////////////////////////////////////////////////////////////////////////////
 function rollSave (e) {
     console.log('rollSave(e)')
-    var classname = 'ct-saving-throws-summary__ability';
+    var classname = md.cp + '-saving-throws-summary__ability';
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
     var save;

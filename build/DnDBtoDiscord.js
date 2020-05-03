@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.21
+// @version       0.2.22
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -166,7 +166,7 @@ function castAttackSpell(e,classname) {
 ////////////////////////////////////////////////////////////////////////////////
 function rollSave (e) {
     console.log('rollSave(e)')
-    var classname = 'ct-saving-throws-summary__ability';
+    var classname = md.cp + '-saving-throws-summary__ability';
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
     var save;
