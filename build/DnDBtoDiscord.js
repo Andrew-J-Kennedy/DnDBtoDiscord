@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.14
+// @version       0.2.15
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -440,6 +440,38 @@ function getOS() {
     return os;
 }
 ////////////////////////////////////////////////////////////////////////////////
+function checkElementExists(classname,innerText = null,cb,timeout = 100) {  // wait for ten seconds
+    var counter = 0;
+    var found;
+    var checkExist = setInterval(function() {
+        var els = document.getElementsByClassName(classname);
+        if (els.length > 0) {
+            if (! innerText) {
+                found = true;
+            } else {
+                for (var i = 0; i < els.length; i++) {
+                    if (els[i].innerText.match(innerText)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        counter++;
+        if (counter > timeout) {
+            found = false;
+        }
+        if (typeof found === 'boolean') {
+            clearInterval(checkExist);
+            if (found) {
+                cb();
+            } else {
+                console.log('Element not found');
+            }
+        }
+    }, 100); // check every 100ms
+}
+////////////////////////////////////////////////////////////////////////////////
     function main() {
         console.log('main');
         var text;
@@ -561,18 +593,20 @@ function getOS() {
         enc: {
             pn: 'encounter-builder-root',  
             cn: 'encounter-details__body',
-            tc: 'encounter-details-content-section__content'
+            tc: 'encounter-details-content-section__content',
+            tt: null
         },
         chr: {
             pn: 'character-sheet-target',
             cn: 'ct-character-sheet-desktop',
-            tc: 'ct-tooltip'
+            tc: 'ct-tooltip',
+            tt: 'Discord'
         }
     };
     var os = getOS();
-    if (os != 'Linux' && document.getElementsByClassName(dt[pg].tc)) {
-        console.log('launch sleep 5000')
-        sleep(5000,function(){main();});
+    if (os != 'Linux') {
+        console.log('launch with checkElementExists')
+        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main();});
     } else {
         console.log('launch with MutationObserver')
         addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
