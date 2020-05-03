@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.16
+// @version       0.2.17
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -440,19 +440,21 @@ function getOS() {
     return os;
 }
 ////////////////////////////////////////////////////////////////////////////////
-function checkElementExists(classname,innerText = null,cb,timeout = 100) {  // wait for ten seconds
+function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // wait for ten seconds
     var counter = 0;
     var found;
     var checkExist = setInterval(function() {
-        var els = document.getElementsByClassName(classname);
-        if (els.length > 0) {
-            if (! innerText) {
-                found = true;
-            } else {
-                for (var i = 0; i < els.length; i++) {
-                    if (els[i].innerText.match(innerText)) {
-                        found = true;
-                        break;
+        for (let classname of classnames) {
+            var els = document.getElementsByClassName(classname);
+            if (els.length > 0) {
+                if (! innerText) {
+                    found = true;
+                } else {
+                    for (var i = 0; i < els.length; i++) {
+                        if (els[i].innerText.match(innerText)) {
+                            found = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -472,22 +474,23 @@ function checkElementExists(classname,innerText = null,cb,timeout = 100) {  // w
     }, 100); // check every 100ms
 }
 ////////////////////////////////////////////////////////////////////////////////
-    function main() {
+    function main(dt) {
         console.log('main');
         var text;
         // Get the Discord Info from Tooltips or Encounter Descr
-        switch (page) {
-            case 'characters':
-                var tooltips = document.getElementsByClassName('ct-tooltip');
-                for (var i = 0; i < tooltips.length; i++) {
-                    if (tooltips[i].innerText.match(/^Discord/)) {
-                        text = tooltips[i].getAttribute('data-original-title');
-                        break;
+        switch (pg) {
+            case 'chr':
+                for (let classname of dt.tc) {
+                    for (let el of document.getElementsByClassName(classname)) {
+                        if (el.innerText.match(dt.tt)) {
+                            text = el.getAttribute('data-original-title');
+                            break;
+                        }
                     }
                 }
                 break;
-            case 'encounters':
-                text = document.getElementsByClassName('encounter-details-content-section__content');
+            case 'enc':
+                text = document.getElementsByClassName(dt.tc);
                 text = (text.length > 0 ) ? text[1].innerText : 'null';
                 text = (text.match(/Discord=\{[\s\S]*\}/)) ? text.replace(/[\s\S]*Discord=\{([\s\S]*)\}[\s\S]*$/m,'$1') : null;
                 break;
@@ -593,23 +596,23 @@ function checkElementExists(classname,innerText = null,cb,timeout = 100) {  // w
         enc: {
             pn: 'encounter-builder-root',  
             cn: 'encounter-details__body',
-            tc: 'encounter-details-content-section__content',
+            tc: ['encounter-details-content-section__content'],
             tt: null
         },
         chr: {
             pn: 'character-sheet-target',
             cn: 'ct-character-sheet-desktop',
-            tc: 'ct-tooltip',
+            tc: ['ct-tooltip','ddbc-tooltip'],
             tt: 'Discord'
         }
     };
     var os = getOS();
     if (os != 'Linux') {
         console.log('launch with checkElementExists')
-        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main();},20);
+        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main(dt[pg]);});
     } else {
         console.log('launch with MutationObserver')
-        addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
+        addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main(dt[pg]);});
     }
     return;
 //   checkNode('class','container');
