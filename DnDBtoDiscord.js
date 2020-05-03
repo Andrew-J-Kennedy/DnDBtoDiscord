@@ -118,6 +118,7 @@ function getSignedNumber (el) {
 ////////////////////////////////////////////////////////////////////////////////
 function castAttackSpell(e,classname) {
     console.log('castAttackSpell(e,classname)')
+    classname = classname.replace(/^\?\?/,md.cp);
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
     var spell_name = p.getElementsByClassName('ct-spell-name')[0].innerText;
@@ -143,9 +144,10 @@ function castAttackSpell(e,classname) {
 
 }
 ////////////////////////////////////////////////////////////////////////////////
-function rollSave (e) {
+function rollSave (e,classname) {
     console.log('rollSave(e)')
-    var classname = md.cp + '-saving-throws-summary__ability';
+    classname = classname.replace(/^\?\?/,md.cp);
+
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
     var save;
@@ -168,6 +170,14 @@ function initToggle (e) {
 ////////////////////////////////////////////////////////////////////////////////
 function rollInitative (e) {
     var sendMsg = (init === 'On') ? '!init join' : '!check initiative';
+    sendToAvrea(e,sendMsg);
+}
+////////////////////////////////////////////////////////////////////////////////
+function turnOver (e) {
+
+    var msg = (window.event.shiftKey) ? prompt("Please enter message:" ) : 'Done';
+
+    var sendMsg = (init === 'On') ? '!init next' : `!embed -thumb ${avatar_url} -desc '${msg}'`;
     sendToAvrea(e,sendMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,16 +246,16 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
         ]
         ,characters: [
             //classname                         ,type     ,logMessage     ,override  ,function
-            ['ct-tab-list__nav-item'            ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(1)}],
-            ['ct-tab-options__header-heading'   ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(2)}],
+            ['??-tab-list__nav-item'            ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(1)}],
+            ['??-tab-options__header-heading'   ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(2)}],
             ['ct-free_text'                     ,'click'  ,'free text'    ,true      ,function(e){freeText(e);}],
             ['ct-init_toggle'                   ,'click'  ,'init toggle'  ,true      ,function(e){initToggle(e);}],
-            ['ct-character-tidbits__avatar'     ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null);}],
-            ['??-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e);}],
+            ['??-character-tidbits__avatar'     ,'click'  ,'next'         ,true      ,function(e){turnOver(e);}],
+            ['??-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e,'??-saving-throws-summary__ability');}],
             ['ct-initiative-box'                ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
             ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
             ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['??-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'ct-combat-attack--spell');}], //sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
+            ['??-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'??-combat-attack--spell');}],
             ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){rollSkill(e);}]
 //          ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
         ]
