@@ -241,11 +241,11 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             ['ct-free_text'                     ,'click'  ,'free text'    ,true      ,function(e){freeText(e);}],
             ['ct-init_toggle'                   ,'click'  ,'init toggle'  ,true      ,function(e){initToggle(e);}],
             ['ct-character-tidbits__avatar'     ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null);}],
-            ['ct-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e);}],
+            ['??-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e);}],
             ['ct-initiative-box'                ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
-            ['ct-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['ct-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['ct-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'ct-combat-attack--spell');}], //sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
+            ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+            ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+            ['??-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'ct-combat-attack--spell');}], //sendToAvrea(e,'!cast $1 -t $2'  ,'self');}],
             ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){rollSkill(e);}]
 //          ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
         ]
@@ -257,6 +257,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             var logMsg = data[page][i][2];
             var override = data[page][i][3];
             var func = data[page][i][4];
+            classname = classname.replace(/^\?\?/,md.cp);
             var els = document.getElementsByClassName(classname);
 
             console.log(logMsg + ': ' + els.length);
@@ -454,12 +455,14 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
 }
 ////////////////////////////////////////////////////////////////////////////////
     function main(dt) {
-        console.log('main: ' + dt.cp);
+        md = dt;  // main data
+
+        console.log('main: ' + md.cp);
         var text;
         // Get the Discord Info from Tooltips or Encounter Descr
         switch (pg) {
             case 'chr':
-                for (let el of document.getElementsByClassName(dt.cp + '-tooltip')) {
+                for (let el of document.getElementsByClassName(md.cp + '-tooltip')) {
                     if (el.innerText.match(/^Discord/)) {
                         text = el.getAttribute('data-original-title');
                         break;
@@ -497,8 +500,8 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
         switch (page) {
             case 'characters':
                 DiscordIdDefault = DiscordId;
-                username = document.getElementsByClassName(dt.cp + '-character-tidbits__name')[0].innerText;
-                avatar_url = document.getElementsByClassName(dt.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
+                username = document.getElementsByClassName(md.cp + '-character-tidbits__name')[0].innerText;
+                avatar_url = document.getElementsByClassName(md.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
                 break;
             case 'encounters':
                 DiscordIdDefault = DiscordIdBot;
@@ -586,7 +589,9 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
             cp: 'ddbc' //classname prefix for some elements
         }]
     };
-//    var os = getOS();
+    var md; // main data
+
+        //    var os = getOS();
 //    if (os != 'Linux') {
 //        console.log('launch with checkElementExists')
 //        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main(dt[pg]);});
