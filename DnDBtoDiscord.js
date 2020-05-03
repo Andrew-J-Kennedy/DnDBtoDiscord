@@ -585,7 +585,7 @@ function checkElementExists(classname,innerText = null,cb,timeout = 100) {  // w
     var os = getOS();
     if (os != 'Linux') {
         console.log('launch with checkElementExists')
-        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main();});
+        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main();},20);
     } else {
         console.log('launch with MutationObserver')
         addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});

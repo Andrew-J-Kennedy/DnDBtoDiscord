@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.15
+// @version       0.2.16
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -606,7 +606,7 @@ function checkElementExists(classname,innerText = null,cb,timeout = 100) {  // w
     var os = getOS();
     if (os != 'Linux') {
         console.log('launch with checkElementExists')
-        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main();});
+        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main();},20);
     } else {
         console.log('launch with MutationObserver')
         addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main();});
