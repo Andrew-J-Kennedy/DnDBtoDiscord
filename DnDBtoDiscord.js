@@ -454,22 +454,20 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
 }
 ////////////////////////////////////////////////////////////////////////////////
     function main(dt) {
-        console.log('main');
+        console.log('main: ' + dt.cp);
         var text;
         // Get the Discord Info from Tooltips or Encounter Descr
         switch (pg) {
             case 'chr':
-                for (let classname of dt.tc) {
-                    for (let el of document.getElementsByClassName(classname)) {
-                        if (el.innerText.match(dt.tt)) {
-                            text = el.getAttribute('data-original-title');
-                            break;
-                        }
+                for (let el of document.getElementsByClassName(dt.cp + '-tooltip')) {
+                    if (el.innerText.match(/^Discord/)) {
+                        text = el.getAttribute('data-original-title');
+                        break;
                     }
                 }
                 break;
             case 'enc':
-                text = document.getElementsByClassName(dt.tc);
+                text = document.getElementsByClassName('encounter-details-content-section__content');
                 text = (text.length > 0 ) ? text[1].innerText : 'null';
                 text = (text.match(/Discord=\{[\s\S]*\}/)) ? text.replace(/[\s\S]*Discord=\{([\s\S]*)\}[\s\S]*$/m,'$1') : null;
                 break;
@@ -570,29 +568,35 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
     const page = (window.location.href.match(/characters/)) ? 'characters' : 'encounters';
     const pg = (page === 'characters') ? 'chr' : 'enc';  //Abbreviated form
     console.log("DnD Beyond to Discord Integration: " + page);
+
     // Wait for the Encounter/Character Sheet to load
     const dt = {
-        enc: {
+        enc: [{
             pn: 'encounter-builder-root',  
             cn: 'encounter-details__body',
-            tc: ['encounter-details-content-section__content'],
-            tt: null
-        },
-        chr: {
+            cp: 'enc' //placeholder
+        }],
+        chr: [{
             pn: 'character-sheet-target',
             cn: 'ct-character-sheet-desktop',
-            tc: ['ct-tooltip','ddbc-tooltip'],
-            tt: 'Discord'
-        }
+            cp: 'ct' //classname prefix for some elements
+        },{
+            pn: 'character-tools-target',
+            cn: 'ct-character-sheet-desktop',
+            cp: 'ddbc' //classname prefix for some elements
+        }]
     };
-    var os = getOS();
-    if (os != 'Linux') {
-        console.log('launch with checkElementExists')
-        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main(dt[pg]);});
-    } else {
+//    var os = getOS();
+//    if (os != 'Linux') {
+//        console.log('launch with checkElementExists')
+//        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main(dt[pg]);});
+//    } else {
         console.log('launch with MutationObserver')
-        addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main(dt[pg]);});
-    }
+        for (let d of dt[pg]) {
+            addNewMutationObserver(document.getElementById(d.pn),d.cn,function(){main(d);});
+        }
+//      addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main(dt[pg]);});
+//    }
     return;
 //   checkNode('class','container');
 //   checkNode('id'   ,'content');
