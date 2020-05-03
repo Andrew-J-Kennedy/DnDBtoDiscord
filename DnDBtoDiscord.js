@@ -567,6 +567,7 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
     var pre;
     var uri;
     var init;
+    var md; // main data
 
     const page = (window.location.href.match(/characters/)) ? 'characters' : 'encounters';
     const pg = (page === 'characters') ? 'chr' : 'enc';  //Abbreviated form
@@ -589,34 +590,11 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
             cp: 'ddbc' //classname prefix for some elements
         }]
     };
-    var md; // main data
-
-        //    var os = getOS();
-//    if (os != 'Linux') {
-//        console.log('launch with checkElementExists')
-//        checkElementExists(dt[pg].tc,dt[pg].tt,function(){main(dt[pg]);});
-//    } else {
-        console.log('launch with MutationObserver')
-        for (let d of dt[pg]) {
-            addNewMutationObserver(document.getElementById(d.pn),d.cn,function(){main(d);});
-        }
-//      addNewMutationObserver(document.getElementById(dt[pg].pn),dt[pg].cn,function(){main(dt[pg]);});
-//    }
+    console.log('launch with MutationObserver')
+    for (let d of dt[pg]) {
+        addNewMutationObserver(document.getElementById(d.pn),d.cn,function(){main(d);});
+    }
     return;
-//   checkNode('class','container');
-//   checkNode('id'   ,'content');
-//   checkNode('class','primary-content');
-//   checkNode('id'   ,'character-sheet-target');
-//   checkNode('class','ct-character-sheet');
-//   addNewMutationObserver(document.getElementById('encounter-builder-root'),'encounter-details__body',function(){main();});
-//   checkNode('class','container');
-//   checkNode('id'   ,'content');
-//   checkNode('class','primary-content');
-//   checkNode('id'   ,'character-sheet-target');
-//   checkNode('id'   ,'encounter-builder-root');
-//   checkNode('class','encounter-details');
-//   checkNode('class','encounter-details__body');
-//   checkNode('class','encounter-details__content'); 
 })();
 /*
 /**/
