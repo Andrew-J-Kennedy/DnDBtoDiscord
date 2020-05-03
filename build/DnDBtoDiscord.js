@@ -5,7 +5,7 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.2.18
+// @version       0.2.19
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
@@ -518,8 +518,8 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
         switch (page) {
             case 'characters':
                 DiscordIdDefault = DiscordId;
-                username = document.getElementsByClassName('ct-character-tidbits__name')[0].innerText;
-                avatar_url = document.getElementsByClassName('ct-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
+                username = document.getElementsByClassName(dt.cp + '-character-tidbits__name')[0].innerText;
+                avatar_url = document.getElementsByClassName(dt.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
                 break;
             case 'encounters':
                 DiscordIdDefault = DiscordIdBot;

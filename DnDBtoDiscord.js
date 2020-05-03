@@ -497,8 +497,8 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
         switch (page) {
             case 'characters':
                 DiscordIdDefault = DiscordId;
-                username = document.getElementsByClassName('ct-character-tidbits__name')[0].innerText;
-                avatar_url = document.getElementsByClassName('ct-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
+                username = document.getElementsByClassName(dt.cp + '-character-tidbits__name')[0].innerText;
+                avatar_url = document.getElementsByClassName(dt.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
                 break;
             case 'encounters':
                 DiscordIdDefault = DiscordIdBot;
