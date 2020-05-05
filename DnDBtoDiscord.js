@@ -110,39 +110,89 @@ function rollSkill (e) {
 ////////////////////////////////////////////////////////////////////////////////
 function getSignedNumber (el) {
     if (! el) {return '+0';}
-    if (el.getElementsByClassName('ct-signed-number').length != 1) {return '+0';}
-    var sign =  el.getElementsByClassName('ct-signed-number__sign')[0].innerText;
-    var number = el.getElementsByClassName('ct-signed-number__number')[0].innerText;
+    if (el.getElementsByClassName(md.cp + '-signed-number').length != 1) {return '+0';}
+    var sign =  el.getElementsByClassName(md.cp + '-signed-number__sign')[0].innerText;
+    var number = el.getElementsByClassName(md.cp + '-signed-number__number')[0].innerText;
     return sign + number;
 }
 ////////////////////////////////////////////////////////////////////////////////
+// Casts Attack Spell as a pre-configured Attack.  Use [ctrl]+[alt]+click to configure
 function castAttackSpell(e,classname) {
     console.log('castAttackSpell(e,classname)')
     classname = classname.replace(/^\?\?/,md.cp);
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
-    var spell_name = p.getElementsByClassName('ct-spell-name')[0].innerText;
-    var to_hit =getSignedNumber(p.getElementsByClassName('ct-combat-attack__tohit')[0]);
-    var damage = p.getElementsByClassName('ct-damage__value')[0].innerText;
-    var dmg_type = p.getElementsByClassName('ct-damage__icon')[0].getElementsByClassName('ct-tooltip ')[0].getAttribute('data-original-title');
-    
-    
+    var spell_name = p.getElementsByClassName(md.cp + '-spell-name')[0].innerText;
     console.log('spell_name: ' + spell_name);
-    console.log('to_hit: ' + to_hit);
-    console.log('damage: ' + damage);
-    console.log('dmg_type: ' + dmg_type);
-
-    var sendMsg = pre + 'multiline "\n';
-
-    sendMsg = sendMsg + pre + 'roll 1d20 ' + to_hit;
-    if (window.event.shiftKey) {
-        sendMsg = sendMsg + ' ' + prompt("Please enter additional args:" );
+    var sendMsg;
+    if (window.event.altKey) { // Configure Attack Spell as an attack
+        var to_hit = getSignedNumber(p.getElementsByClassName(md.cp + '-combat-attack__tohit')[0]);
+        console.log('to_hit: ' + to_hit);
+        var damage = p.getElementsByClassName(md.cp + '-damage__value')[0].innerText;
+        console.log('damage: ' + damage);
+        var dmg_type = p.getElementsByClassName(md.cp + '-damage__icon')[0].getElementsByClassName(md.cp + '-tooltip ')[0].getAttribute('data-original-title');
+        console.log('dmg_type: ' + dmg_type);
+            //    !attack add "Eldritch Blast" -b +7 -d 1d10[force]
+        sendMsg = pre + 'attack add "' + spell_name + '" -b ' + to_hit + ' -d ' + damage + '[' + dmg_type + ']';
+    } else {
+        sendMsg = pre + 'attack "' + spell_name + '"';
+        if (init === 'On') {
+            var target = prompt("Enter target and additional args:" );
+            if (target){
+                sendMsg = sendMsg + ' -t ' + target;
+            } else {
+                sendMsg = null;
+            }
+        } else {
+            if (window.event.shiftKey) {
+                var args = prompt("Enter additional args:" );
+                sendMsg = sendMsg + ' ' + args;
+            }
+        }        
     }
-    sendMsg = sendMsg + ' ' + spell_name + '\n';
-    sendMsg = sendMsg + pre + 'roll ' + damage + '[' + dmg_type + '] Damage\n"';
-    sendToAvrea(e,sendMsg);
+
+    console.log(sendMsg);
+    sendMessage(sendMsg);
 
 }
+////////////////////////////////////////////////////////////////////////////////
+function rollAttack (e,classname) {
+    console.log('rollAttack(e)')
+    classname = classname.replace(/^\?\?/,md.cp);
+
+    var p = findRelevantParent(e.target,classname);
+    if (! p) {console.log('Classname not found: ' + classname);return}
+
+    var attack_label = p.getElementsByClassName('ct-combat-attack__label')[0].innerText;
+
+    var sendMsg = (init === 'On') ? pre + 'init attack ' : pre + 'attack ';
+
+    if (window.event.altKey && p.getElementsByClassName('ct-damage ct-damage--versatile').length > 0) {
+        attack_label = '2-Handed ' + attack_label
+    }
+    sendMsg = sendMsg + attack_label;
+
+    if (init === 'On') {
+        var target = prompt("Enter target and additional args:" );
+        if (target){
+            sendMsg = sendMsg + ' -t ' + target;
+        } else {
+            sendMsg = null;
+        }
+    } else {
+        if (window.event.shiftKey) {
+            var args = prompt("Enter additional args:" );
+            sendMsg = sendMsg + ' ' + args;
+        }
+    }        
+    console.log(sendMsg);
+    sendMessage(sendMsg);
+
+//    ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+//    ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 function rollSave (e,classname) {
     console.log('rollSave(e)')
@@ -181,10 +231,10 @@ function turnOver (e) {
     sendToAvrea(e,sendMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
-    function freeText (e,DiscordIdOverride = null) {
-        var sendMsg = prompt("Please enter your message:" );
-        if (sendMsg) {sendMessage(sendMsg,DiscordIdOverride);}
-    }
+function freeText (e,DiscordIdOverride = null) {
+    var sendMsg = prompt("Please enter your message:" );
+    if (sendMsg) {sendMessage(sendMsg,DiscordIdOverride);}
+}
 ////////////////////////////////////////////////////////////////////////////////
 function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) {
 
@@ -217,7 +267,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             }
         } else { // Remove targeting parameter if init system off
             sendMsgFinal = sendMsgFinal.replace('-t $2','');
-            var args = prompt("Please enter and extra args:" );
+            var args = prompt("Please enter any extra args:" );
             if (target){
                 sendMsgFinal = sendMsgFinal + ' ' + args;
             }
@@ -253,8 +303,8 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             ['??-character-tidbits__avatar'     ,'click'  ,'next'         ,true      ,function(e){turnOver(e);}],
             ['??-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e,'??-saving-throws-summary__ability');}],
             ['ct-initiative-box'                ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
-            ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-            ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
+            ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){rollAttack(e,'??-combat-attack--item');}],
+            ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){rollAttack(e,'??-combat-action-attack-weapon');}],
             ['??-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'??-combat-attack--spell');}],
             ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){rollSkill(e);}]
 //          ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
