@@ -117,8 +117,8 @@ function getSignedNumber (el) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Casts Attack Spell as a pre-configured Attack.  Use [ctrl]+[alt]+click to configure
-function castAttackSpell(e,classname) {
-    console.log('castAttackSpell(e,classname)')
+function rollAttackSpell(e,classname) {
+    console.log('rollAttackSpell(e,classname)')
     classname = classname.replace(/^\?\?/,md.cp);
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
@@ -132,7 +132,6 @@ function castAttackSpell(e,classname) {
         console.log('damage: ' + damage);
         var dmg_type = p.getElementsByClassName(md.cp + '-damage__icon')[0].getElementsByClassName(md.cp + '-tooltip ')[0].getAttribute('data-original-title');
         console.log('dmg_type: ' + dmg_type);
-            //    !attack add "Eldritch Blast" -b +7 -d 1d10[force]
         sendMsg = pre + 'attack add "' + spell_name + '" -b ' + to_hit + ' -d ' + damage + '[' + dmg_type + ']';
     } else {
         sendMsg = pre + 'attack "' + spell_name + '"';
@@ -156,6 +155,102 @@ function castAttackSpell(e,classname) {
 
 }
 ////////////////////////////////////////////////////////////////////////////////
+function rollAbility (e,classname) {
+    console.log('rollTool(e)')
+    classname = classname.replace(/^\?\?/,md.cp);
+
+    var p = findRelevantParent(e.target,classname);
+    if (! p) {console.log('Classname not found: ' + classname);return}
+    var stat_name = p.getElementsByClassName(md.cp + '-ability-summary__label')[0].innerText;
+    var stat = p.getElementsByClassName(md.cp + '-ability-summary__abbr')[0].innerText;
+    console.log(stat_name + ' ' + stat);
+
+    var common = {
+        command: 'check',
+        options: 'adv/dis -b [conditional bonus] -dc [dc] -mc [minimum roll] -rr [iterations]'
+    };
+    
+    var sendMsg = pre + common.command + ' ' + stat;
+
+    if (window.event.shiftKey) {
+        var args = prompt("Enter options: " + common.options);
+        sendMsg = sendMsg + ' ' + args;
+    }
+    sendMsg = sendMsg + ' -title "' + username + ' checks ' + stat_name + '"';
+    console.log(sendMsg);
+    sendMessage(sendMsg);
+}
+////////////////////////////////////////////////////////////////////////////////
+function rollTool (e,classname) {
+    console.log('rollTool(e)')
+    classname = classname.replace(/^\?\?/,md.cp);
+
+    var p = findRelevantParent(e.target,classname);
+    if (! p) {console.log('Classname not found: ' + classname);return}
+    var tool_name = p.innerText.replace(/, $/,'');
+    console.log(tool_name);
+
+    var common = {
+        command: 'check',
+        options: 'adv/dis -b [conditional bonus] -dc [dc] -mc [minimum roll] -rr [iterations]'
+    };
+    var tools = [
+        {stat: 'dex',name: "Thieves' Tools"}
+    ];
+    var tool;
+    for (let t of tools) {
+        if (t.name === tool_name) {
+            tool = t;
+            break;
+        }
+    }
+    if (! tool) {console.log('Tool not found: ' + tool_name);return}
+    
+    var sendMsg = pre + common.command + ' ' + tool.stat;
+
+    if (window.event.shiftKey) {
+        var args = prompt("Enter options: " + common.options);
+        sendMsg = sendMsg + ' ' + args;
+    }
+    sendMsg = sendMsg + ' -b ' + prof_bonus + ' -title "' + username + ' uses ' +tool_name + '"';
+    console.log(sendMsg);
+    sendMessage(sendMsg);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+function rollSnippet (e,classname) {
+    console.log('rollSnippet(e)')
+    classname = classname.replace(/^\?\?/,md.cp);
+
+    var p = findRelevantParent(e.target,classname);
+    if (! p) {console.log('Classname not found: ' + classname);return}
+    var snippet_name = p.innerText;
+    var snippets = [
+        {name: 'Divine Smite (Special)',
+        command: 'smite',
+        options: '[-l #] [-i] [-t target] [crit] [fiend|undead]'
+     }
+    ];
+    var snippet;
+    for (let s of snippets) {
+        if (s.name === snippet_name) {
+            snippet = s;
+            break;
+        }
+    }
+    if (! snippet) {console.log('Snippet not found: ' + snippet_name);return}
+
+    var sendMsg = pre + snippet.command;
+
+    if (window.event.shiftKey) {
+        var args = prompt("Enter options: " + snippet.options);
+        sendMsg = sendMsg + ' ' + args;
+    }
+    console.log(sendMsg);
+    sendMessage(sendMsg);
+}
+////////////////////////////////////////////////////////////////////////////////
 function rollAttack (e,classname) {
     console.log('rollAttack(e)')
     classname = classname.replace(/^\?\?/,md.cp);
@@ -163,11 +258,11 @@ function rollAttack (e,classname) {
     var p = findRelevantParent(e.target,classname);
     if (! p) {console.log('Classname not found: ' + classname);return}
 
-    var attack_label = p.getElementsByClassName('ct-combat-attack__label')[0].innerText;
+    var attack_label = p.getElementsByClassName(md.cp + '-combat-attack__label')[0].innerText;
 
     var sendMsg = (init === 'On') ? pre + 'init attack ' : pre + 'attack ';
 
-    if (window.event.altKey && p.getElementsByClassName('ct-damage ct-damage--versatile').length > 0) {
+    if (window.event.altKey && p.getElementsByClassName(md.cp + '-damage--versatile').length > 0) {
         attack_label = '2-Handed ' + attack_label
     }
     sendMsg = sendMsg + attack_label;
@@ -187,10 +282,6 @@ function rollAttack (e,classname) {
     }        
     console.log(sendMsg);
     sendMessage(sendMsg);
-
-//    ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-//    ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){sendToAvrea(e,'!attack $1 -t $2','self');}],
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -284,30 +375,32 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
         console.log('addNewEventListeners');
         const data = {
          encounters: [
-            //classname                         ,type     ,logMessage     ,override  ,function
-            ['qa-init_begin'                    ,'click'  ,'start'        ,true      ,function(e){sendToAvrea(e,'!init begin',null,DiscordIdBot);}],
-            ['qa-init_madd'                     ,'click'  ,'add mob'      ,true      ,function(e){addMobs(e);}],
-            ['qa-init_next'                     ,'click'  ,'next'         ,true      ,function(e){sendToAvrea(e,'!init next',null,DiscordIdBot);}],
-            ['qa-init_list'                     ,'click'  ,'list'         ,true      ,function(e){sendToAvrea(e,'!init list',null,DiscordIdBot);}],
-            ['qa-init_end'                      ,'click'  ,'end'          ,true      ,function(e){sendToAvrea(e,'!init end -yes',null,DiscordIdBot);}],
-            ['qa-chat'                          ,'click'  ,'chat'         ,true      ,function(e){freeText(e,DiscordIdBot);}],
-            ['qa-chat_bot'                      ,'click'  ,'chat bot'     ,true      ,function(e){sendToAvrea(e,null,null,DiscordIdBot);}],
-            ['encounter-details-monster'        ,'click'  ,'monster'      ,true      ,function(e){selectMobs(e);}]
+            //classname                         ,type     ,logMessage      ,override  ,function
+            ['qa-init_begin'                    ,'click'  ,'start'         ,true      ,function(e){sendToAvrea(e,'!init begin',null,DiscordIdBot);}],
+            ['qa-init_madd'                     ,'click'  ,'add mob'       ,true      ,function(e){addMobs(e);}],
+            ['qa-init_next'                     ,'click'  ,'next'          ,true      ,function(e){sendToAvrea(e,'!init next',null,DiscordIdBot);}],
+            ['qa-init_list'                     ,'click'  ,'list'          ,true      ,function(e){sendToAvrea(e,'!init list',null,DiscordIdBot);}],
+            ['qa-init_end'                      ,'click'  ,'end'           ,true      ,function(e){sendToAvrea(e,'!init end -yes',null,DiscordIdBot);}],
+            ['qa-chat'                          ,'click'  ,'chat'          ,true      ,function(e){freeText(e,DiscordIdBot);}],
+            ['qa-chat_bot'                      ,'click'  ,'chat bot'      ,true      ,function(e){sendToAvrea(e,null,null,DiscordIdBot);}],
+            ['encounter-details-monster'        ,'click'  ,'monster'       ,true      ,function(e){selectMobs(e);}]
         ]
         ,characters: [
-            //classname                         ,type     ,logMessage     ,override  ,function
-            ['??-tab-list__nav-item'            ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(1)}],
-            ['??-tab-options__header-heading'   ,'click'  ,'refresh lstnr',false     ,function(){addNewEventListeners(2)}],
-            ['ct-free_text'                     ,'click'  ,'free text'    ,true      ,function(e){freeText(e);}],
-            ['ct-init_toggle'                   ,'click'  ,'init toggle'  ,true      ,function(e){initToggle(e);}],
-            ['??-character-tidbits__avatar'     ,'click'  ,'next'         ,true      ,function(e){turnOver(e);}],
-            ['??-saving-throws-summary__ability','click'  ,'save'         ,true      ,function(e){rollSave(e,'??-saving-throws-summary__ability');}],
-            ['ct-initiative-box'                ,'click'  ,'initiative'   ,true      ,function(e){rollInitative(e);}],
-            ['??-combat-attack--item'           ,'click'  ,'attack'       ,true      ,function(e){rollAttack(e,'??-combat-attack--item');}],
-            ['??-combat-action-attack-weapon'   ,'click'  ,'attack'       ,true      ,function(e){rollAttack(e,'??-combat-action-attack-weapon');}],
-            ['??-combat-attack--spell'          ,'click'  ,'cast'         ,true      ,function(e){castAttackSpell(e,'??-combat-attack--spell');}],
-            ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){rollSkill(e);}]
-//          ['ct-skills__item'                  ,'click'  ,'check(skill)' ,true      ,function(e){sendToAvrea(e,'!check $1'       ,'self');}]
+            //classname                         ,type     ,logMessage      ,override  ,function
+            ['??-tab-list__nav-item'            ,'click'  ,'refresh lstnr' ,false     ,function(){addNewEventListeners(1)}],
+            ['??-tab-options__header-heading'   ,'click'  ,'refresh lstnr' ,false     ,function(){addNewEventListeners(2)}],
+            ['ct-free_text'                     ,'click'  ,'free text'     ,true      ,function(e){freeText(e);}],
+            ['ct-init_toggle'                   ,'click'  ,'init toggle'   ,true      ,function(e){initToggle(e);}],
+            ['??-character-tidbits__avatar'     ,'click'  ,'next'          ,true      ,function(e){turnOver(e);}],
+            ['ct-quick-info__ability'           ,'click'  ,'check(ability)',true      ,function(e){rollAbility(e,'ct-quick-info__ability');}],
+            ['??-saving-throws-summary__ability','click'  ,'save'          ,true      ,function(e){rollSave(e,'??-saving-throws-summary__ability');}],
+            ['ct-initiative-box'                ,'click'  ,'initiative'    ,true      ,function(e){rollInitative(e);}],
+            ['??-combat-attack--item'           ,'click'  ,'attack'        ,true      ,function(e){rollAttack(e,'??-combat-attack--item');}],
+            ['??-combat-action-attack-weapon'   ,'click'  ,'attack'        ,true      ,function(e){rollAttack(e,'??-combat-action-attack-weapon');}],
+            ['??-combat-attack--spell'          ,'click'  ,'cast'          ,true      ,function(e){rollAttackSpell(e,'??-combat-attack--spell');}],
+            ['ct-skills__item'                  ,'click'  ,'check(skill)'  ,true      ,function(e){rollSkill(e);}],
+            ['??-tooltip'                       ,'click'  ,'check(tool)'   ,true      ,function(e){rollTool(e,'??-tooltip');}],
+            ['ct-feature-snippet__heading'      ,'click'  ,'snippet'       ,true      ,function(e){rollSnippet(e,'ct-feature-snippet__heading');}]
         ]
         };
         for (var i = start; i < data[page].length; i++) {
@@ -562,6 +655,7 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
                 DiscordIdDefault = DiscordId;
                 username = document.getElementsByClassName(md.cp + '-character-tidbits__name')[0].innerText;
                 avatar_url = document.getElementsByClassName(md.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
+                prof_bonus = parseInt(getSignedNumber(document.getElementsByClassName('ct-proficiency-bonus-box__value')[0]));
                 break;
             case 'encounters':
                 DiscordIdDefault = DiscordIdBot;
@@ -628,6 +722,7 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
     var uri;
     var init;
     var md; // main data
+    var prof_bonus;
 
     const page = (window.location.href.match(/characters/)) ? 'characters' : 'encounters';
     const pg = (page === 'characters') ? 'chr' : 'enc';  //Abbreviated form
