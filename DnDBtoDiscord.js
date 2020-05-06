@@ -10,8 +10,8 @@
         var DiscordIdCurrent = DiscordIdDefault;
         if (DiscordIdOverride) {DiscordIdCurrent = DiscordIdOverride;}
 
-        // Only embed alias DiscordId when sending to Avrae Bot or different from DiscordIdBot
-        var embed = ((content.substr(0,1) === pre) || (DiscordIdCurrent != DiscordIdBot));
+        // Only embed alias DiscordId when sending to Avrae Bot and different from DiscordIdBot
+        var embed = ((content.substr(0,1) === pre) && (DiscordIdCurrent != DiscordIdBot));
 
         var request = new XMLHttpRequest();
         request.open("POST", uri);
@@ -170,13 +170,14 @@ function rollAbility (e,classname) {
         options: 'adv/dis -b [conditional bonus] -dc [dc] -mc [minimum roll] -rr [iterations]'
     };
     
-    var sendMsg = pre + common.command + ' ' + stat;
+    var sendMsg = pre + common.command + ' ' + stat_name;
 
     if (window.event.shiftKey) {
         var args = prompt("Enter options: " + common.options);
         sendMsg = sendMsg + ' ' + args;
     }
-    sendMsg = sendMsg + ' -title "' + username + ' checks ' + stat_name + '"';
+    var prep = ( /^[AEIOU]/.test(stat_name)) ? 'an ' : 'a ';
+    sendMsg = sendMsg + ' -title "' + username + ' makes ' + prep + stat_name + ' check!"';
     console.log(sendMsg);
     sendMessage(sendMsg);
 }
