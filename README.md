@@ -35,11 +35,11 @@ Replace: 000000000000000000... with Discord User Id
 Open Chrome at:  
 https://www.dndbeyond.com/
 
-For Players: Open a character previously inported in your server's Avrae Bot.
+For Players: Open a character previously imported in your server's Avrae Bot.
 
 Click on the PROFICENCIES & LANGUAGES manage icon (gears) at the bottom left of page.
 
-In the sidebar that opos up on the right-hand side select:
+In the sidebar that pops up on the right-hand side select:
 ADD NEW PROFICIENCIES
  Custom
    Tool
@@ -47,6 +47,10 @@ ADD NEW PROFICIENCIES
 Replace: "Custom Tool 1" with "Discord"
 In the Enter Source Note textbox paste in: "CampaignName,DiscordName"
 (whatever you configured in the file above)
+
+SecondSundering,Dworic
+
+
 
 You don't need to save.
 
