@@ -5,13 +5,14 @@
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.3.1
+// @version       0.3.2
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
 // @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
 // @require       file://C:/DnDBtoDiscordPrivate.js
 // @require       file://C:/temp/DnDBtoDiscordPrivate.js
+// @require       DnDBtoDiscordConfig.js
 
 // @grant none
 // ==/UserScript==
