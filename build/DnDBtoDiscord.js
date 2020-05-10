@@ -4,8 +4,8 @@
 // @description   DnD Beyond to Discord Integration
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
-// @license       MIT
-// @version       0.3.2.8
+// @license       LGPL-3.0-or-later; https://raw.githubusercontent.com/Andrew-J-Kennedy/DnDBtoDiscord/master/LICENSE
+// @version       0.3.2.9
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
