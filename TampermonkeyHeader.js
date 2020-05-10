@@ -12,6 +12,8 @@
 // @grant         GM_getValue
 // @grant         GM_setValue
 // @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
+
+// @grant none
 // ==/UserScript==
 
 // ==OpenUserJS==
