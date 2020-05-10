@@ -1,6 +1,6 @@
 // ==UserScript==
 // @namespace     https://openuserjs.org/users/Andrew-J-Kennedy
-// @name          DnDBtoDiscord-Dev
+// @name          DnDBtoDiscord
 // @description   DnD Beyond to Discord Integration
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
@@ -12,7 +12,9 @@
 // @require       https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @grant         GM_getValue
 // @grant         GM_setValue
-// @require       file:///opt/DnDBtoDiscord/DnDBtoDiscord.js
+// @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
+
+// @grant none
 // ==/UserScript==
 
 // ==OpenUserJS==

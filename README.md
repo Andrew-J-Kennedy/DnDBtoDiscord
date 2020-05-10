@@ -1,39 +1,41 @@
+This script is designed to allow users to communicate with a modified Avrae bot on Discord.
+
+You need to have a WebHook setup on your Discord server:
+
+You need to have an instance of the modified Avrae bot running on your Discord server:
+
+https://github.com/Andrew-J-Kennedy/avrae
+
+The functional difference from Avrae is that you can setup a whitelist for a bot and Avrae will respond.
+
+
+To install the client-side script:
 
 Install Tampermonkey in Chrome:
 
 https://www.tampermonkey.net/
 
-
-Allow Tampermonkey to access your local files:
-
-chrome://extensions/?id=dhdgffkkebhmkfjojejmpbldmpobfkfo
-Switch: Allow access to file URLs
-
-Install UserScript:
+Install the UserScript:
 
 https://openuserjs.org/scripts/Andrew-J-Kennedy/DnDBtoDiscord
-
-Create File on Disk:
-
-C:\DnDBtoDiscordPrivate.js
-==============================================================
-'use strict';
-// The Server Prefix annd Discord Bot Key for your games
-const DiscordServerSettings = [
-    {name: 'CampaignName', settings:  ['!','00--WEBHOOK-URL-00/QWERTY------------------------RANDOM-KEY----------------------XCVBNM']}
-];
-// The Discord Ids for your games (a DM may have multiple NPC users)
-const DiscordIds = [
-    {name: 'DiscordName', id: '000000000000000000'},
-];
-==============================================================
-
-Replace: 00--WEBHOOK-URL-00... with Discord Server Bot WebHook
-Replace: 000000000000000000... with Discord User Id
 
 
 Open Chrome at:  
 https://www.dndbeyond.com/
+
+Navigate to a character sheet.
+
+You will be prompted to set the Default Config settings.
+
+Replace: 00--WEBHOOK-URL-00... with Discord Server Bot WebHook
+Replace: 000000000000000000... with Discord User Id
+
+The other Options are: if you have changed the server prefix you Avrea bot is listening for; and to indicate if you are using the Avrae init sub-system.
+
+Each character you open with this browser will use these defults, but you can overide these settings for each character (for example: you are in multiple campaigns)
+
+
+
 
 For Players: Open a character previously imported in your server's Avrae Bot.
 
