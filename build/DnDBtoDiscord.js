@@ -9,6 +9,7 @@
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
+// @require       https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @grant         GM_getValue
 // @grant         GM_setValue
 // @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
