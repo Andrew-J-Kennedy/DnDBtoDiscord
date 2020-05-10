@@ -1,20 +1,17 @@
 // ==UserScript==
 // @namespace     https://openuserjs.org/users/Andrew-J-Kennedy
-// @name          DnDBtoDiscord
+// @name          DnDBtoDiscord-Dev
 // @description   DnD Beyond to Discord Integration
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.3.2
+// @version       0.3.3
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
-// @require       file:///opt/DnDBtoDiscord/DnDBtoDiscordPrivate.js
-// @require       file://C:/DnDBtoDiscordPrivate.js
-// @require       file://C:/temp/DnDBtoDiscordPrivate.js
-// @require       DnDBtoDiscordConfig.js
-
-// @grant none
+// @require       https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @grant         GM_getValue
+// @grant         GM_setValue
 // ==/UserScript==
 
 // ==OpenUserJS==
@@ -25,33 +22,35 @@
 
 /**/
 (function() {
-    'use strict';
+'use strict';
 ////////////////////////////////////////////////////////////////////////////////
-    function sendMessage(content, DiscordIdOverride = null) {
-        if (! content) {return;}
-        var DiscordIdCurrent = DiscordIdDefault;
-        if (DiscordIdOverride) {DiscordIdCurrent = DiscordIdOverride;}
+function sendMessage(content, DiscordIdOverride = null) {
+    if (! content) {return;}
+    var DiscordIdCurrent = DiscordIdDefault;
+    if (DiscordIdOverride) {DiscordIdCurrent = DiscordIdOverride;}
 
-        // Only embed alias DiscordId when sending to Avrae Bot and different from DiscordIdBot
-        var embed = ((content.substr(0,1) === pre) && (DiscordIdCurrent != DiscordIdBot));
+    // Only embed alias DiscordId when sending to Avrae Bot and different from DiscordIdBot
+    var embed = ((content.substr(0,1) === pre) && (DiscordIdCurrent != DiscordIdBot));
+//    console.log(content.substr(0,1) + ' === ' + pre);
+//    console.log(DiscordIdCurrent + ' != ' + DiscordIdBot);
 
-        var request = new XMLHttpRequest();
-        request.open("POST", uri);
-        request.setRequestHeader('Content-type', 'application/json');
-        var params = {
-            username: username,
-            avatar_url: avatar_url,
-            content: content,
-            embeds: ( (embed) ? [{fields: [{name: 'alias',value: DiscordIdCurrent}]}] : null)
-        }
-        console.log(JSON.stringify(params))
-        request.send(JSON.stringify(params));
+    var request = new XMLHttpRequest();
+    request.open("POST", uri);
+    request.setRequestHeader('Content-type', 'application/json');
+    var params = {
+        username: username,
+        avatar_url: avatar_url,
+        content: content,
+        embeds: ( (embed) ? [{fields: [{name: 'alias',value: DiscordIdCurrent}]}] : null)
     }
+    console.log(JSON.stringify(params))
+    request.send(JSON.stringify(params));
+}
 ////////////////////////////////////////////////////////////////////////////////
-    function addNewEventListenerFinal(e,logMsg,func) {
-        if (logMsg) {console.log(logMsg);}
-        if (func) {func(e);}
-    }
+function addNewEventListenerFinal(e,logMsg,func) {
+    if (logMsg) {console.log(logMsg);}
+    if (func) {func(e);}
+}
 ////////////////////////////////////////////////////////////////////////////////
 function sleep(ms,cb) {
     var sleepms = setInterval(function() {
@@ -60,53 +59,49 @@ function sleep(ms,cb) {
     },ms);
 }
 ////////////////////////////////////////////////////////////////////////////////
-    function addNewEventListener(e,logMsg,override,func) {
-        if (window.event.ctrlKey || ! override) {
-            if (override) {
-                event.stopImmediatePropagation();
-                addNewEventListenerFinal(e,logMsg,func);
-            } else {
-                // Wait for others to complete
-                sleep(100,function(){addNewEventListenerFinal(e,logMsg,func)});
-            }
-        }
-    }
-////////////////////////////////////////////////////////////////////////////////
-    function addNewEventListenerDelegate(logMsg,override,func) {
-        return function(e){
-            addNewEventListener(e,logMsg,override,func)
-        }
-    }
-////////////////////////////////////////////////////////////////////////////////
-    function selectMobs (e) {
-        console.log('selectMobs(e)')
-        var p = e.target.parentNode.parentNode;
-        var classname = 'is-selected';
-        if (p.classList.contains(classname)) {
-            p.classList.remove('is-selected');
+function addNewEventListener(e,logMsg,override,func) {
+    if (window.event.ctrlKey || ! override) {
+        if (override) {
+            event.stopImmediatePropagation();
+            addNewEventListenerFinal(e,logMsg,func);
         } else {
-            p.classList.add('is-selected');
+            // Wait for others to complete
+            sleep(100,function(){addNewEventListenerFinal(e,logMsg,func)});
         }
     }
+}
 ////////////////////////////////////////////////////////////////////////////////
-    function addMobs (e) {
-        console.log('addMobs(e)')
-        var elem = document.getElementsByClassName('encounter-details-monster is-selected');
-        for (var j = 0; j < elem.length; j++) {
-            var monster_name = elem[j].getElementsByClassName('encounter-details-monster__name')[0].innerText;
-            var monster_abrv = monster_name.replace(/[^A-Z]/g,'');
-            monster_abrv += monster_name.replace(/.*[A-Z]/,'');
-            monster_abrv = monster_abrv.substring(0,3).toUpperCase() + '#';
-            var sendMsgFinal = pre + 'init madd "' + monster_name + '" -name ' + monster_abrv;
-            console.log(monster_name + ':' + monster_abrv);
-//            sendToAvrea(e,sendMsgFinal);
-            sendToAvrea(e,sendMsgFinal,null,DiscordIdBot);
-
-        }    
+function addNewEventListenerDelegate(logMsg,override,func) {
+    return function(e){
+        addNewEventListener(e,logMsg,override,func)
     }
+}
 ////////////////////////////////////////////////////////////////////////////////
-function statBlock (e) {
-    console.log('statBlock(e)')
+function selectMobs (e) {
+    console.log('selectMobs(e)')
+    var p = e.target.parentNode.parentNode;
+    var classname = 'is-selected';
+    if (p.classList.contains(classname)) {
+        p.classList.remove('is-selected');
+    } else {
+        p.classList.add('is-selected');
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+function addMobs (e) {
+    console.log('addMobs(e)')
+    var elem = document.getElementsByClassName('encounter-details-monster is-selected');
+    for (var j = 0; j < elem.length; j++) {
+        var monster_name = elem[j].getElementsByClassName('encounter-details-monster__name')[0].innerText;
+        var monster_abrv = monster_name.replace(/[^A-Z]/g,'');
+        monster_abrv += monster_name.replace(/.*[A-Z]/,'');
+        monster_abrv = monster_abrv.substring(0,3).toUpperCase() + '#';
+        var sendMsgFinal = pre + 'init madd "' + monster_name + '" -name ' + monster_abrv;
+        console.log(monster_name + ':' + monster_abrv);
+//            sendToAvrea(e,sendMsgFinal);
+        sendToAvrea(e,sendMsgFinal,null,DiscordIdBot);
+
+    }    
 }
 ////////////////////////////////////////////////////////////////////////////////
 function findRelevantParent (el,classname) {
@@ -157,7 +152,7 @@ function rollAttackSpell(e,classname) {
         sendMsg = pre + 'attack add "' + spell_name + '" -b ' + to_hit + ' -d ' + damage + '[' + dmg_type + ']';
     } else {
         sendMsg = pre + 'attack "' + spell_name + '"';
-        if (init === 'On') {
+        if (init) {
             var target = prompt("Enter target and additional args:" );
             if (target){
                 sendMsg = sendMsg + ' -t ' + target;
@@ -174,7 +169,6 @@ function rollAttackSpell(e,classname) {
 
     console.log(sendMsg);
     sendMessage(sendMsg);
-
 }
 ////////////////////////////////////////////////////////////////////////////////
 function rollAbility (e,classname) {
@@ -239,8 +233,6 @@ function rollTool (e,classname) {
     console.log(sendMsg);
     sendMessage(sendMsg);
 }
-
-
 ////////////////////////////////////////////////////////////////////////////////
 function rollSnippet (e,classname) {
     console.log('rollSnippet(e)')
@@ -282,15 +274,13 @@ function rollAttack (e,classname) {
     if (! p) {console.log('Classname not found: ' + classname);return}
 
     var attack_label = p.getElementsByClassName(md.cp + '-combat-attack__label')[0].innerText;
-
-    var sendMsg = (init === 'On') ? pre + 'init attack ' : pre + 'attack ';
+    var sendMsg = (init) ? pre + 'init attack ' : pre + 'attack ';
 
     if (window.event.altKey && p.getElementsByClassName(md.cp + '-damage--versatile').length > 0) {
         attack_label = '2-Handed ' + attack_label
     }
     sendMsg = sendMsg + attack_label;
-
-    if (init === 'On') {
+    if (init) {
         var target = prompt("Enter target and additional args:" );
         if (target){
             sendMsg = sendMsg + ' -t ' + target;
@@ -306,7 +296,6 @@ function rollAttack (e,classname) {
     console.log(sendMsg);
     sendMessage(sendMsg);
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 function rollSave (e,classname) {
     console.log('rollSave(e)')
@@ -327,13 +316,8 @@ function rollSave (e,classname) {
     sendToAvrea(e,sendMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
-function initToggle (e) {
-    init = (init === 'On') ? 'Off' : 'On';
-    e.target.innerText = 'Init ' + init;
-}
-////////////////////////////////////////////////////////////////////////////////
 function rollInitative (e) {
-    var sendMsg = (init === 'On') ? '!init join' : '!check initiative';
+    var sendMsg = (init) ? '!init join' : '!check initiative';
     sendToAvrea(e,sendMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +325,7 @@ function turnOver (e) {
 
     var msg = (window.event.shiftKey) ? prompt("Please enter message:" ) : 'Done';
 
-    var sendMsg = (init === 'On') ? '!init next' : `!embed -thumb ${avatar_url} -desc '${msg}'`;
+    var sendMsg = (init) ? '!init next' : `!embed -thumb ${avatar_url} -desc '${msg}'`;
     sendToAvrea(e,sendMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -372,7 +356,7 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
         sendMsgFinal = sendMsgFinal.replace('$1',Arg1);
     }
     if (sendMsg.includes('-t $2')) {  // Target Required
-        if (init === 'On') {
+        if (init) {
             var target = prompt("Please enter your target:" );
             if (target){
                 sendMsgFinal = sendMsgFinal.replace('$2',target);
@@ -387,341 +371,251 @@ function sendToAvrea (e,sendMsg,Arg1_innerText = null,DiscordIdOverride = null) 
             }
         }
     }
-    if (sendMsg.includes('init ') && init === 'Off') { // Remove init argument if init system off
+    if (sendMsg.includes('init ') && ! init) { // Remove init argument if init system off
         sendMsgFinal = sendMsgFinal.replace('init ','');
     }
     console.log(sendMsgFinal);
     sendMessage(sendMsgFinal,DiscordIdOverride);
 }
 ////////////////////////////////////////////////////////////////////////////////
-    function addNewEventListeners(start = 0) {
-        console.log('addNewEventListeners');
-        const data = {
-         encounters: [
-            //classname                         ,type     ,logMessage      ,override  ,function
-            ['qa-init_begin'                    ,'click'  ,'start'         ,true      ,function(e){sendToAvrea(e,'!init begin',null,DiscordIdBot);}],
-            ['qa-init_madd'                     ,'click'  ,'add mob'       ,true      ,function(e){addMobs(e);}],
-            ['qa-init_next'                     ,'click'  ,'next'          ,true      ,function(e){sendToAvrea(e,'!init next',null,DiscordIdBot);}],
-            ['qa-init_list'                     ,'click'  ,'list'          ,true      ,function(e){sendToAvrea(e,'!init list',null,DiscordIdBot);}],
-            ['qa-init_end'                      ,'click'  ,'end'           ,true      ,function(e){sendToAvrea(e,'!init end -yes',null,DiscordIdBot);}],
-            ['qa-chat'                          ,'click'  ,'chat'          ,true      ,function(e){freeText(e,DiscordIdBot);}],
-            ['qa-chat_bot'                      ,'click'  ,'chat bot'      ,true      ,function(e){sendToAvrea(e,null,null,DiscordIdBot);}],
-            ['encounter-details-monster'        ,'click'  ,'monster'       ,true      ,function(e){selectMobs(e);}]
-        ]
-        ,characters: [
-            //classname                         ,type     ,logMessage      ,override  ,function
-            ['??-tab-list__nav-item'            ,'click'  ,'refresh lstnr' ,false     ,function(){addNewEventListeners(1)}],
-            ['??-tab-options__header-heading'   ,'click'  ,'refresh lstnr' ,false     ,function(){addNewEventListeners(2)}],
-            ['ct-free_text'                     ,'click'  ,'free text'     ,true      ,function(e){freeText(e);}],
-            ['ct-init_toggle'                   ,'click'  ,'init toggle'   ,true      ,function(e){initToggle(e);}],
-            ['??-character-tidbits__avatar'     ,'click'  ,'next'          ,true      ,function(e){turnOver(e);}],
-            ['ct-quick-info__ability'           ,'click'  ,'check(ability)',true      ,function(e){rollAbility(e,'ct-quick-info__ability');}],
-            ['??-saving-throws-summary__ability','click'  ,'save'          ,true      ,function(e){rollSave(e,'??-saving-throws-summary__ability');}],
-            ['ct-initiative-box'                ,'click'  ,'initiative'    ,true      ,function(e){rollInitative(e);}],
-            ['??-combat-attack--item'           ,'click'  ,'attack'        ,true      ,function(e){rollAttack(e,'??-combat-attack--item');}],
-            ['??-combat-action-attack-weapon'   ,'click'  ,'attack'        ,true      ,function(e){rollAttack(e,'??-combat-action-attack-weapon');}],
-            ['??-combat-attack--spell'          ,'click'  ,'cast'          ,true      ,function(e){rollAttackSpell(e,'??-combat-attack--spell');}],
-            ['ct-skills__item'                  ,'click'  ,'check(skill)'  ,true      ,function(e){rollSkill(e);}],
-            ['??-tooltip'                       ,'click'  ,'check(tool)'   ,true      ,function(e){rollTool(e,'??-tooltip');}],
-            ['ct-feature-snippet__heading'      ,'click'  ,'snippet'       ,true      ,function(e){rollSnippet(e,'ct-feature-snippet__heading');}]
-        ]
-        };
-        for (var i = start; i < data[page].length; i++) {
-            console.log(data[page][i]);
-            var classname = data[page][i][0];
-            var etype = data[page][i][1];
-            var logMsg = data[page][i][2];
-            var override = data[page][i][3];
-            var func = data[page][i][4];
-            classname = classname.replace(/^\?\?/,md.cp);
-            var els = document.getElementsByClassName(classname);
-
-            console.log(logMsg + ': ' + els.length);
-            for (var j = 0; j < els.length; j++) {
-                console.log(j + ':' + logMsg);
-                els[j].addEventListener(etype, addNewEventListenerDelegate(logMsg,override,func), false);
-            }
-        }
-    } // addNewEventListeners
+function openConfig() {
+    if (window.event.altKey) {
+        GM_config.open();
+    } else {
+        gmcuid.open();
+    }
+}
 ////////////////////////////////////////////////////////////////////////////////
-    function containsObject(obj, list) {
-        for (var i = 0; i < list.length; i++) {
-            if (list[i] === obj) {
-                return true;
-            }
+function addNewEventListeners(start = 0) {
+    console.log('addNewEventListeners');
+    const data = {
+        encounters: [
+        //classname                         ,type     ,logMessage      ,override  ,function
+        ['qa-init_begin'                    ,'click'  ,'start'         ,true      ,function(e){sendToAvrea(e,'!init begin',null,DiscordIdBot);}],
+        ['qa-init_madd'                     ,'click'  ,'add mob'       ,true      ,function(e){addMobs(e);}],
+        ['qa-init_next'                     ,'click'  ,'next'          ,true      ,function(e){sendToAvrea(e,'!init next',null,DiscordIdBot);}],
+        ['qa-init_list'                     ,'click'  ,'list'          ,true      ,function(e){sendToAvrea(e,'!init list',null,DiscordIdBot);}],
+        ['qa-init_end'                      ,'click'  ,'end'           ,true      ,function(e){sendToAvrea(e,'!init end -yes',null,DiscordIdBot);}],
+        ['qa-chat'                          ,'click'  ,'chat'          ,true      ,function(e){freeText(e,DiscordIdBot);}],
+        ['qa-chat_bot'                      ,'click'  ,'chat bot'      ,true      ,function(e){sendToAvrea(e,null,null,DiscordIdBot);}],
+        ['encounter-details-monster'        ,'click'  ,'monster'       ,true      ,function(e){selectMobs(e);}]
+    ]
+    ,characters: [
+        //classname                         ,type     ,logMessage      ,override  ,function
+        ['??-tab-list__nav-item'            ,'click'  ,'refresh lstnr' ,false     ,function(){addNewEventListeners(1)}],
+        ['??-tab-options__header-heading'   ,'click'  ,'refresh lstnr' ,false     ,function(){addNewEventListeners(2)}],
+        ['ct-free_text'                     ,'click'  ,'free text'     ,true      ,function(e){freeText(e);}],
+        ['ct-config'                        ,'click'  ,'config'        ,true      ,function(e){openConfig();}],
+        ['??-character-tidbits__avatar'     ,'click'  ,'next'          ,true      ,function(e){turnOver(e);}],
+        ['ct-quick-info__ability'           ,'click'  ,'check(ability)',true      ,function(e){rollAbility(e,'ct-quick-info__ability');}],
+        ['??-saving-throws-summary__ability','click'  ,'save'          ,true      ,function(e){rollSave(e,'??-saving-throws-summary__ability');}],
+        ['ct-initiative-box'                ,'click'  ,'initiative'    ,true      ,function(e){rollInitative(e);}],
+        ['??-combat-attack--item'           ,'click'  ,'attack'        ,true      ,function(e){rollAttack(e,'??-combat-attack--item');}],
+        ['??-combat-action-attack-weapon'   ,'click'  ,'attack'        ,true      ,function(e){rollAttack(e,'??-combat-action-attack-weapon');}],
+        ['??-combat-attack--spell'          ,'click'  ,'cast'          ,true      ,function(e){rollAttackSpell(e,'??-combat-attack--spell');}],
+        ['ct-skills__item'                  ,'click'  ,'check(skill)'  ,true      ,function(e){rollSkill(e);}],
+        ['??-tooltip'                       ,'click'  ,'check(tool)'   ,true      ,function(e){rollTool(e,'??-tooltip');}],
+        ['ct-feature-snippet__heading'      ,'click'  ,'snippet'       ,true      ,function(e){rollSnippet(e,'ct-feature-snippet__heading');}]
+    ]
+    };
+    for (var i = start; i < data[page].length; i++) {
+        console.log(data[page][i]);
+        var classname = data[page][i][0];
+        var etype = data[page][i][1];
+        var logMsg = data[page][i][2];
+        var override = data[page][i][3];
+        var func = data[page][i][4];
+        classname = classname.replace(/^\?\?/,md.cp);
+        var els = document.getElementsByClassName(classname);
+
+        console.log(logMsg + ': ' + els.length);
+        for (var j = 0; j < els.length; j++) {
+            console.log(j + ':' + logMsg);
+            els[j].addEventListener(etype, addNewEventListenerDelegate(logMsg,override,func), false);
         }
-        return false;
-    }    
+    }
+} // addNewEventListeners
 ////////////////////////////////////////////////////////////////////////////////
-    function addNewMutationObservers () {
+function containsObject(obj, list) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}    
+////////////////////////////////////////////////////////////////////////////////
+function addNewMutationObservers () {
 
-        console.log('addNewMutationObservers');
-        const data = {
-            encounters: [
-                {
-                    classname: 'encounter-details__content',
-                    type: 'click',
-                    logMessage: 'attack',
-                    override: true,
-                    func: function(e){sendToAvrea(e,'!init attack $1 -t $2','self');},
-                    cbn_cn0: 'encounter-details__content-section--monster-stat-block', // Mutation Node
-                    cbn_cn1: 'mon-stat-block__description-block-content', // Relevent Node
-                    cbn_tst_sib: {cn:'mon-stat-block__description-block-heading',text:'Actions'}, // Test sibling node
-                    find_target: {type: 'tag', name: 'strong'}
-                }
-            ],
-            characters: [
-            ]
-        };
-        for (var i = 0; i < data[page].length; i++) {
-            console.log(data[page][i]);
-            var jd = data[page][i]; // Job Details
+    console.log('addNewMutationObservers');
+    const data = {
+        encounters: [
+            {
+                classname: 'encounter-details__content',
+                type: 'click',
+                logMessage: 'attack',
+                override: true,
+                func: function(e){sendToAvrea(e,'!init attack $1 -t $2','self');},
+                cbn_cn0: 'encounter-details__content-section--monster-stat-block', // Mutation Node
+                cbn_cn1: 'mon-stat-block__description-block-content', // Relevent Node
+                cbn_tst_sib: {cn:'mon-stat-block__description-block-heading',text:'Actions'}, // Test sibling node
+                find_target: {type: 'tag', name: 'strong'}
+            }
+        ],
+        characters: [
+        ]
+    };
+    for (var i = 0; i < data[page].length; i++) {
+        console.log(data[page][i]);
+        var jd = data[page][i]; // Job Details
 
-            var targetNode = document.getElementsByClassName(jd.classname)[0];
-            var config = { attributes: false, childList: true, subtree: true };
-            var callback = function(mutationsList, observer) {
-                for(let mutation of mutationsList) {
-                    if (mutation.addedNodes.length > 0) {
-                        var node_f = []; // node found
-                        for(let node_m of mutation.addedNodes) { 
-                            if (node_m instanceof HTMLElement) {
-                                if (node_m.classList.contains(jd.cbn_cn0)) { //Top Down (Relevant Node is below the Added Node)
-                                    for(let node_r of node_m.getElementsByClassName(jd.cbn_cn1)) {
-                                        var tst_sib = (jd.cbn_tst_sib) ? node_r.parentNode.getElementsByClassName(jd.cbn_tst_sib.cn)[0] : null;
-                                        if (tst_sib && tst_sib.innerText === jd.cbn_tst_sib.text ) {
-                                            node_f.push(node_r);
-                                        }
+        var targetNode = document.getElementsByClassName(jd.classname)[0];
+        var config = { attributes: false, childList: true, subtree: true };
+        var callback = function(mutationsList, observer) {
+            for(let mutation of mutationsList) {
+                if (mutation.addedNodes.length > 0) {
+                    var node_f = []; // node found
+                    for(let node_m of mutation.addedNodes) { 
+                        if (node_m instanceof HTMLElement) {
+                            if (node_m.classList.contains(jd.cbn_cn0)) { //Top Down (Relevant Node is below the Added Node)
+                                for(let node_r of node_m.getElementsByClassName(jd.cbn_cn1)) {
+                                    var tst_sib = (jd.cbn_tst_sib) ? node_r.parentNode.getElementsByClassName(jd.cbn_tst_sib.cn)[0] : null;
+                                    if (tst_sib && tst_sib.innerText === jd.cbn_tst_sib.text ) {
+                                        node_f.push(node_r);
                                     }
-                                } else { // Bottom up (Added Nodes are inside the Relevant Node)
-                                    var tst_sib = (jd.cbn_tst_sib) ? node_m.parentNode.parentNode.getElementsByClassName(jd.cbn_tst_sib.cn)[0] : null;
-                                    if (tst_sib && tst_sib.parentNode === node_m.parentNode.parentNode && tst_sib.innerText === jd.cbn_tst_sib.text ) {
-                                        if ( ! containsObject(node_m.parentNode, node_f)) {
-                                            node_f.push(node_m.parentNode);
-                                        }
+                                }
+                            } else { // Bottom up (Added Nodes are inside the Relevant Node)
+                                var tst_sib = (jd.cbn_tst_sib) ? node_m.parentNode.parentNode.getElementsByClassName(jd.cbn_tst_sib.cn)[0] : null;
+                                if (tst_sib && tst_sib.parentNode === node_m.parentNode.parentNode && tst_sib.innerText === jd.cbn_tst_sib.text ) {
+                                    if ( ! containsObject(node_m.parentNode, node_f)) {
+                                        node_f.push(node_m.parentNode);
                                     }
                                 }
                             }
                         }
-                        for(let nf of node_f) {
+                    }
+                    for(let nf of node_f) {
 //                            console.log('nf.classList: ' + nf.classList);
-                            for(let e of nf.getElementsByTagName(jd.find_target.name)) {
+                        for(let e of nf.getElementsByTagName(jd.find_target.name)) {
 //                                console.log('e.innerText: ' + e.innerText);
-                                e.addEventListener(jd.type, addNewEventListenerDelegate(jd.logMessage,jd.override,jd.func), false);
-                            }
-                        }
-                    }
-                }
-            };
-            var observer = new MutationObserver(callback);
-            observer.observe(targetNode, config);
-        }
-    }
-////////////////////////////////////////////////////////////////////////////////
-    function addNewMutationObserverTest (searchTerm,e,cb) {
-        if (! e) {return;}
-        const config = { attributes: false, childList: true, subtree: true };
-        const callback = function(mutationsList, observer) {
-            for(let mutation of mutationsList) {
-                if (mutation.addedNodes.length > 0) {
-                    for(let node of mutation.addedNodes) {
-                        if (node instanceof HTMLDivElement && node.classList.contains('encounter-details__body')) {
-                            console.log(searchTerm + ': ' + node.classList);
+                            e.addEventListener(jd.type, addNewEventListenerDelegate(jd.logMessage,jd.override,jd.func), false);
                         }
                     }
                 }
             }
         };
-        const observer = new MutationObserver(callback);
-        observer.observe(e, config);
+        var observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
     }
+}
 ////////////////////////////////////////////////////////////////////////////////
-    function checkNode (searchType,searchTerm) {
-        var e,els,len;
-        switch (searchType) {
-            case 'id':
-                e = document.getElementById(searchTerm);
-                if (e) {len = 1};
-                break;
-            case 'class':
-                els = document.getElementsByClassName(searchTerm);
-                if (els) {e = els[0];len=els.length};
-                break;
+function addNewMutationObserverTest (searchTerm,e,cb) {
+    if (! e) {return;}
+    const config = { attributes: false, childList: true, subtree: true };
+    const callback = function(mutationsList, observer) {
+        for(let mutation of mutationsList) {
+            if (mutation.addedNodes.length > 0) {
+                for(let node of mutation.addedNodes) {
+                    if (node instanceof HTMLDivElement && node.classList.contains('encounter-details__body')) {
+                        console.log(searchTerm + ': ' + node.classList);
+                    }
+                }
+            }
         }
-        console.log(searchTerm + ': ' + len);
-        addNewMutationObserverTest(searchTerm,e,function(){alert('foo');});
-    }
+    };
+    const observer = new MutationObserver(callback);
+    observer.observe(e, config);
+}
 ////////////////////////////////////////////////////////////////////////////////
-    // Main Mutation Observer - waiting for the page to fully load
-    function addNewMutationObserver (e,classname,cb) {
-        if (! e) {console.log('undefined');return;}
-        console.log('classname: ' + classname);
-        const config = { attributes: false, childList: true, subtree: true };
-        const callback = function(mutationsList, observer) {
-            for(let mutation of mutationsList) {
-                if (mutation.addedNodes.length > 0) {
-                    for(let node of mutation.addedNodes) {
+// Main Mutation Observer - waiting for the page to fully load
+function addNewMutationObserver (e,classname,cb) {
+    if (! e) {console.log('undefined');return;}
+    console.log('classname: ' + classname);
+    const config = { attributes: false, childList: true, subtree: true };
+    const callback = function(mutationsList, observer) {
+        for(let mutation of mutationsList) {
+            if (mutation.addedNodes.length > 0) {
+                for(let node of mutation.addedNodes) {
 //                      console.log(node);
-                        if (node instanceof HTMLDivElement && (node.classList.contains(classname)||node.childNodes[0].classList.contains(classname))) {
+                    if (node instanceof HTMLDivElement && (node.classList.contains(classname)||node.childNodes[0].classList.contains(classname))) {
 //                          console.log('node: ' + node);
-                            cb();
-                        }
+                        cb();
                     }
                 }
             }
-        };
-        const observer = new MutationObserver(callback);
-        observer.observe(e, config);
-    }
-////////////////////////////////////////////////////////////////////////////////
-function getOS() {
-    var userAgent = window.navigator.userAgent,
-        platform = window.navigator.platform,
-        macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
-        windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
-        iosPlatforms = ['iPhone', 'iPad', 'iPod'],
-        os = null;
-    
-    if (macosPlatforms.indexOf(platform) !== -1) {
-        os = 'Mac OS';
-    } else if (iosPlatforms.indexOf(platform) !== -1) {
-        os = 'iOS';
-    } else if (windowsPlatforms.indexOf(platform) !== -1) {
-        os = 'Windows';
-    } else if (/Android/.test(userAgent)) {
-        os = 'Android';
-    } else if (!os && /Linux/.test(platform)) {
-        os = 'Linux';
-    }
-    
-    return os;
+        }
+    };
+    const observer = new MutationObserver(callback);
+    observer.observe(e, config);
 }
 ////////////////////////////////////////////////////////////////////////////////
-function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // wait for ten seconds
-    var counter = 0;
-    var found;
-    var checkExist = setInterval(function() {
-        for (let classname of classnames) {
-            var els = document.getElementsByClassName(classname);
-            if (els.length > 0) {
-                if (! innerText) {
-                    found = true;
-                } else {
-                    for (var i = 0; i < els.length; i++) {
-                        if (els[i].innerText.match(innerText)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        counter++;
-        if (counter > timeout) {
-            found = false;
-        }
-        if (typeof found === 'boolean') {
-            clearInterval(checkExist);
-            if (found) {
-                cb();
-            } else {
-                console.log('Element not found');
-            }
-        }
-    }, 100); // check every 100ms
-}
+function configToGlobals () {
+    WebHook = gmcuid.get('WebHook');
+    DiscordId = gmcuid.get('DiscordId');
+    DiscordIdBot = WebHook.split('/')[0];
+    pre = gmcuid.get('ServerPrefix');
+    uri = 'https://discordapp.com/api/webhooks/' + WebHook;
+    init = (gmcuid.get('InitSystem')|| pg === 'enc') ? true : false;
+}        
 ////////////////////////////////////////////////////////////////////////////////
-    function main(dt) {
-        md = dt;  // main data
+function main(dt) {
+    md = dt;  // main data
 
-        console.log('main: ' + md.cp);
-        var text;
-        // Get the Discord Info from Tooltips or Encounter Descr
-        switch (pg) {
-            case 'chr':
-                for (let el of document.getElementsByClassName(md.cp + '-tooltip')) {
-                    if (el.innerText.match(/^Discord/)) {
-                        text = el.getAttribute('data-original-title');
-                        break;
-                    }
-                }
-                break;
-            case 'enc':
-                text = document.getElementsByClassName('encounter-details-content-section__content');
-                text = (text.length > 0 ) ? text[1].innerText : 'null';
-                text = (text.match(/Discord=\{[\s\S]*\}/)) ? text.replace(/[\s\S]*Discord=\{([\s\S]*)\}[\s\S]*$/m,'$1') : null;
-                break;
+    console.log('main: ' + md.cp);
+    configToGlobals();
+    console.log('uri: ' + uri);
+
+    // Username and Avatar details
+    switch (page) {
+        case 'characters':
+            DiscordIdDefault = DiscordId;
+            username = document.getElementsByClassName(md.cp + '-character-tidbits__name')[0].innerText;
+            avatar_url = document.getElementsByClassName(md.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("([^?"]*).*/, '$1') ;
+            prof_bonus = parseInt(getSignedNumber(document.getElementsByClassName('ct-proficiency-bonus-box__value')[0]));
+            break;
+        case 'encounters':
+            DiscordIdDefault = DiscordIdBot;
+            username = 'DM';
+            avatar_url = 'https://i.imgur.com/kLfuisi.png';
+            break;
+    }
+    console.log('username: ' + username);
+    console.log('DiscordId: ' + DiscordId);
+    // Add any additional buttons
+    const data = {
+        encounters: {
+            parentNode: 'ddb-page-header__controls',
+            template: '<a class="ddbeb-button dndb2d_text-here"></a>',
+            buttons: [
+                //classname                      ,text
+                ['qa-init_begin'                 ,'Start Fight'],
+                ['qa-init_madd'                  ,'Add Mobs'],
+                ['qa-init_next'                  ,'Next'],
+                ['qa-init_list'                  ,'List'],
+                ['qa-init_end'                   ,'End Fight'],
+                ['qa-chat'                       ,'Chat'],
+                ['qa-chat_bot'                   ,'Chat Bot']
+            ]
+        },
+        characters: {
+            parentNode: 'ct-character-header-desktop',
+            template: '<div class="ct-character-header-desktop__group"><div class="ct-character-header-desktop__button"><span class="ct-character-header-desktop__button-label dndb2d_text-here"></span></div></div>',
+            buttons: [
+                //classname                      ,text
+                ['ct-free_text'                  ,'Free Text'],
+                ['ct-config'                     ,'Config']
+            ]
         }
-        if (! text) {console.log('DiscordServer,DiscordName Not Found');return}
-        console.log('text: ' + text);
-        text = text.replace(/^"(.+(?="$))"$/, '$1'); // Remove and quotes
-        console.log('text: ' + text);
-        var values = text.split(',');
-        const DiscordServerName = values[0];
-        const DiscordIdName = values[1];
-        console.log(`DiscordServerName,DiscordIdName Found: ${DiscordServerName},${DiscordIdName}`);
-        var DiscordServer;
-        for (let rec of DiscordIds)     {if (DiscordIdName     === rec.name) {DiscordId = rec.id}}
-        for (let rec of DiscordServers) {if (DiscordServerName === rec.name) {DiscordServer = rec.settings}}
-        DiscordIdBot = DiscordServer.webhook.split('/')[0];
-        pre = DiscordServer.pre;
-        uri = 'https://discordapp.com/api/webhooks/' + DiscordServer.webhook;
-
-        init = (DiscordServer.init === 1 || page === 'encounters') ? 'On' : 'Off';
-
-//        console.log('DiscordIdBot: ' + DiscordIdBot);
-//        console.log('pre: ' + pre);
-//        console.log('uri: ' + uri);
-
-        // Username and Avatar details
-        switch (page) {
-            case 'characters':
-                DiscordIdDefault = DiscordId;
-                username = document.getElementsByClassName(md.cp + '-character-tidbits__name')[0].innerText;
-                avatar_url = document.getElementsByClassName(md.cp + '-character-tidbits__avatar')[0].style.backgroundImage.replace(/url\("(.*)"\)/, '$1') ;
-                prof_bonus = parseInt(getSignedNumber(document.getElementsByClassName('ct-proficiency-bonus-box__value')[0]));
-                break;
-            case 'encounters':
-                DiscordIdDefault = DiscordIdBot;
-                username = 'DM';
-                avatar_url = 'https://i.imgur.com/kLfuisi.png';
-                break;
-        }
-        console.log('username: ' + username);
-        console.log('DiscordId: ' + DiscordId);
-        // Add any additional buttons
-        const data = {
-            encounters: {
-                parentNode: 'ddb-page-header__controls',
-                template: '<a class="ddbeb-button dndb2d_text-here"></a>',
-                buttons: [
-                    //classname                      ,text
-                    ['qa-init_begin'                 ,'Start Fight'],
-                    ['qa-init_madd'                  ,'Add Mobs'],
-                    ['qa-init_next'                  ,'Next'],
-                    ['qa-init_list'                  ,'List'],
-                    ['qa-init_end'                   ,'End Fight'],
-                    ['qa-chat'                       ,'Chat'],
-                    ['qa-chat_bot'                   ,'Chat Bot']
-                ]
-            },
-            characters: {
-                parentNode: 'ct-character-header-desktop',
-                template: '<div class="ct-character-header-desktop__group"><div class="ct-character-header-desktop__button"><span class="ct-character-header-desktop__button-label dndb2d_text-here"></span></div></div>',
-                buttons: [
-                    //classname                      ,text
-                    ['ct-init_toggle'                ,'Init ' + init],
-                    ['ct-free_text'                  ,'Free Text']
-                ]
-            }
-        };
-        if (data[page].buttons.length > 0) {
-            const parentNode = document.getElementsByClassName(data[page].parentNode)[0];
-            if (parentNode) {
-                var tpn = document.createElement('div');
-                tpn.innerHTML = data[page].template;
-                for (var i = 0; i < data[page].buttons.length; i++) {
+    };
+    if (data[page].buttons.length > 0) {
+        const parentNode = document.getElementsByClassName(data[page].parentNode)[0];
+        if (parentNode) {
+            var tpn = document.createElement('div');
+            tpn.innerHTML = data[page].template;
+            for (var i = 0; i < data[page].buttons.length; i++) {
+                var classname = data[page].buttons[i][0];
+                if (document.getElementsByClassName(classname).length == 0) {
                     console.log(data[page].buttons[i]);
-                    var classname = data[page].buttons[i][0];
                     var text = data[page].buttons[i][1];
                     var pn = tpn.cloneNode(true);
                     pn.childNodes[0].classList.add(classname);
@@ -730,49 +624,167 @@ function checkElementExists(classnames,innerText = null,cb,timeout = 100) {  // 
                 }
             }
         }
-        // Add EventListeners and MutationObservers
-        addNewEventListeners();
-        addNewMutationObservers();
-        return;  
-    } // main
-    // Script-wide variables
-    var DiscordId;
-    var DiscordIdBot;
-    var DiscordIdDefault;
-    var username;
-    var avatar_url;
-    var pre;
-    var uri;
-    var init;
-    var md; // main data
-    var prof_bonus;
-
-    const page = (window.location.href.match(/characters/)) ? 'characters' : 'encounters';
-    const pg = (page === 'characters') ? 'chr' : 'enc';  //Abbreviated form
-    console.log("DnD Beyond to Discord Integration: " + page);
-
-    // Wait for the Encounter/Character Sheet to load
-    const dt = {
-        enc: [{
-            pn: 'encounter-builder-root',  
-            cn: 'encounter-details__body',
-            cp: 'enc' //placeholder
-        }],
-        chr: [{
-            pn: 'character-sheet-target',
-            cn: 'ct-character-sheet-desktop',
-            cp: 'ct' //classname prefix for some elements
-        },{
-            pn: 'character-tools-target',
-            cn: 'ct-character-sheet-desktop',
-            cp: 'ddbc' //classname prefix for some elements
-        }]
-    };
-    console.log('launch with MutationObserver')
-    for (let d of dt[pg]) {
-        addNewMutationObserver(document.getElementById(d.pn),d.cn,function(){main(d);});
     }
-    return;
+    // Add EventListeners and MutationObservers
+    addNewEventListeners();
+    addNewMutationObservers();
+    return;  
+} // main
+
+// Script-wide variables
+var DiscordId;
+var WebHook;
+var DiscordIdBot;
+var DiscordIdDefault;
+var username;
+var avatar_url;
+var pre;
+var uri;
+var init;
+var md; // main data
+var prof_bonus;
+
+const page = (window.location.href.match(/characters/)) ? 'characters' : 'encounters';
+const pg = (page === 'characters') ? 'chr' : 'enc';  //Abbreviated form
+console.log("DnD Beyond to Discord Integration: " + page);
+
+// Setup Configuration: Location to place the Config div and Unique Identifier
+const cfg = {
+    enc: {
+        cn:  'mm-navbar__container',
+        uid: window.location.href.replace(/[\s\S]*encounters\/([\s\S]*)$/,'$1')
+    },
+    chr: {
+        cn: 'site-bar__container',
+        uid: window.location.href.replace(/[\s\S]*characters\/([0-9]{8}[0-9]*)[\s\S]*$/,'$1')
+    }
+};
+
+console.log(cfg[pg].uid);
+
+var site_bar = document.getElementsByClassName(cfg[pg].cn)[0];
+var frame0 = document.createElement('div');
+var frame1 = document.createElement('div');
+site_bar.appendChild(frame0);
+site_bar.appendChild(frame1);
+
+var GMconfigId0 = 'DnDBeyond2DiscordDefaults-0.0.1';
+var GMconfig0 = {
+    'id': GMconfigId0,
+    'title': 'DnD Beyond to Discord Default Config Settings',
+    'fields': {
+        'ServerPrefix': {
+            'label': 'Server Prefix',
+            'type': 'text',
+            'size': 1,
+            'default': '!'
+        },
+        'InitSystem': {
+            'label': 'Init System',
+            'type': 'checkbox',
+            'default': false
+        },
+        'WebHook': {
+            'label': 'Discord Server WebHook',
+            'type': 'text',
+            'size': 87,
+            'default': '00--WEBHOOK-URL-00/QWERTY------------------------RANDOM-KEY----------------------XCVBNM'
+        },
+        'DiscordId': {
+            'label': 'Discord User Id',
+            'type': 'text',
+            'size': 18,
+            'default': '000000000000000000'
+        }
+    },
+    'events': {
+        'init': function() {checkConfigDefaults();},
+        'open': function() {
+            var e = document.getElementById(GMconfigId0);
+            e.classList.add('mm-mega-menu');
+            e.classList.add('mm-nav-item__label');
+        },
+        'save': function() { setConfigDefaults(); },
+    },
+    'frame': frame0
+};
+
+function checkConfigDefaults () {
+    if (GMconfig0.fields.WebHook.default === GM_config.get('WebHook') || GMconfig0.fields.DiscordId.default === GM_config.get('DiscordId') ) {
+        GM_config.open();
+    } else {
+        setConfigDefaults();
+    }
+}
+function setConfigDefaults () {
+    GMconfig1 = {
+        'id': GMconfigId1,
+        'title': 'DnD Beyond to Discord Config Settings',
+        'fields': {
+            'ServerPrefix': {
+                'label': 'Server Prefix',
+                'type': 'text',
+                'size': 1,
+                'default': GM_config.get('ServerPrefix')
+            },
+            'InitSystem': {
+                'label': 'Init System',
+                'type': 'checkbox',
+                'default': GM_config.get('InitSystem')
+            },
+            'WebHook': {
+                'label': 'Discord Server WebHook',
+                'type': 'text',
+                'size': 87,
+                'default': GM_config.get('WebHook')
+            },
+            'DiscordId': {
+                'label': 'Discord User Id',
+                'type': 'text',
+                'size': 18,
+                'default': GM_config.get('DiscordId')
+            }
+        },
+        'events': {
+            'save': function() { configToGlobals(); },
+        },
+        'frame': frame1
+    };
+
+    gmcuid = new GM_configStruct(GMconfig1);
+    console.log('gmcuid DiscordId: ' + gmcuid.get('DiscordId'));
+
+}
+
+var GMconfigId1 = 'DnDBeyond2Discord-' + cfg[pg].uid;
+var GMconfig1;
+var gmcuid;
+    
+GM_config.init(GMconfig0);
+
+// Wait for the Encounter/Character Sheet to load
+const dt = {
+    enc: [{
+        pn: 'encounter-builder-root',  
+        cn: 'encounter-details__body',
+        cp: 'enc' //placeholder
+    }],
+    chr: [{
+        pn: 'character-sheet-target',
+        cn: 'ct-character-sheet-desktop',
+        cp: 'ct' //classname prefix for some elements
+    },{
+        pn: 'character-tools-target',
+        cn: 'ct-character-sheet-desktop',
+        cp: 'ddbc' //classname prefix for some elements
+    }]
+};
+console.log('launch with MutationObserver')
+for (let d of dt[pg]) {
+    addNewMutationObserver(document.getElementById(d.pn),d.cn,function(){main(d);});
+}
 })();
 /*
 /**/
+
+
