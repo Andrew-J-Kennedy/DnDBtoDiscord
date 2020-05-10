@@ -1,11 +1,11 @@
 // ==UserScript==
 // @namespace     https://openuserjs.org/users/Andrew-J-Kennedy
-// @name          DnDBtoDiscord
+// @name          DnDBtoDiscord-Dev
 // @description   DnD Beyond to Discord Integration
 // @author        Andrew-J-Kennedy
 // @copyright     2020, Andrew-J-Kennedy (https://openuserjs.org/users/Andrew-J-Kennedy)
 // @license       MIT
-// @version       0.3.4
+// @version       0.3.5
 // @match         https://www.dndbeyond.com/encounters/*
 // @match         https://www.dndbeyond.com/profile/*/characters/*
 // @match         https://www.dndbeyond.com/characters/*
